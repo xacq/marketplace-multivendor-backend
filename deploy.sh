@@ -29,16 +29,16 @@ php artisan route:clear
 php artisan view:clear
 php artisan event:clear
 
-echo "⚡ Cacheando configuración..."
+echo "⚡ Cacheando configuración...."
 php artisan config:cache
 php artisan route:cache
 php artisan event:cache
 php artisan view:cache
 
-echo "🔗 Enlazando storage..."
+echo "🔗 Enlazando storage...."
 php artisan storage:link 2>/dev/null || true
 
-echo "🔒 Ajustando permisos..."
+echo "🔒 Ajustando permisos...."
 chmod -R 775 storage bootstrap/cache
 
 echo "✅ Modo mantenimiento OFF"
