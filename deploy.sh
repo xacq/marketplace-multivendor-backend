@@ -31,7 +31,7 @@ php artisan event:clear
 
 echo "⚡ Cacheando configuración...."
 php artisan config:cache
-php artisan route:cache
+php artisan route:cache || true
 php artisan event:cache
 php artisan view:cache
 
