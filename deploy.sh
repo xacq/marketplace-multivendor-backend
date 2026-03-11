@@ -20,7 +20,7 @@ echo "📦 Pulling desde GitHub..."
 git pull origin main
 
 echo "📚 Instalando dependencias..."
-composer install --no-dev --optimize-autoloader --no-interaction
+php /opt/cpanel/ea-wappspector/composer.phar install --no-dev --optimize-autoloader --no-interaction
 
 echo "🧹 Limpiando cachés..."
 php artisan cache:clear
