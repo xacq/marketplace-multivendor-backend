@@ -35,7 +35,7 @@ php artisan route:cache
 php artisan event:cache
 php artisan view:cache
 
-echo "🔗 Enlazando storage...."
+echo "🔗 Enlazando storage..."
 php artisan storage:link 2>/dev/null || true
 
 echo "🔒 Ajustando permisos..."
