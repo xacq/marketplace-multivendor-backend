@@ -29,9 +29,6 @@ php artisan route:clear
 php artisan view:clear
 php artisan event:clear
 
-echo "🗄️  Ejecutando migraciones..."
-php artisan migrate --force
-
 echo "⚡ Cacheando configuración..."
 php artisan config:cache
 php artisan route:cache
