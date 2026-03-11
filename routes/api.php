@@ -188,7 +188,7 @@ Route::group(['middleware' => ['maintainance']], function () {
     Route::post('/store-reset-password/{token}', [LoginController::class, 'storeResetPasswordPage'])->name('store-reset-password');
     Route::get('/user/logout', [LoginController::class, 'userLogout'])->name('user.logout');
 
-    Route::group(['as'=> 'user.', 'prefix' => 'user'],function (){
+    Route::group(['as'=> 'api.user.', 'prefix' => 'user'],function (){
         Route::get('dashboard', [UserProfileController::class, 'dashboard'])->name('dashboard');
         Route::get('order', [UserProfileController::class, 'order'])->name('order');
         Route::get('pending-order', [UserProfileController::class, 'pendingOrder'])->name('pending-order');
@@ -224,7 +224,7 @@ Route::group(['middleware' => ['maintainance']], function () {
         Route::get('load-new-message/{id}', [MessageController::class, 'loadNewMessage'])->name('load-new-message');
         Route::get('send-message', [MessageController::class, 'sendMessage'])->name('send-message');
 
-        Route::group(['as'=> 'checkout.', 'prefix' => 'checkout'],function (){
+        Route::group(['as'=> 'api.checkout.', 'prefix' => 'checkout'],function (){
             Route::get('/', [CheckoutController::class, 'checkout'])->name('checkout');
 
             Route::post('/cash-on-delivery', [PaymentController::class, 'cashOnDelivery'])->name('cash-on-delivery');
@@ -240,7 +240,7 @@ Route::group(['middleware' => ['maintainance']], function () {
     });
 
 
-    Route::group(['as'=> 'seller.', 'prefix' => 'seller'],function (){
+    Route::group(['as'=> 'api.seller.', 'prefix' => 'seller'],function (){
         Route::get('dashboard',[SellerDashboardController::class,'index'])->name('dashboard');
         Route::get('my-profile',[SellerProfileController::class,'index'])->name('my-profile');
         Route::get('state-by-country/{id}',[SellerProfileController::class,'stateByCountry'])->name('state-by-country');
@@ -324,7 +324,7 @@ Route::group(['middleware' => ['maintainance']], function () {
 });
 
 // start admin routes
-Route::group(['as'=> 'admin.', 'prefix' => 'admin'],function (){
+Route::group(['as'=> 'api.admin.', 'prefix' => 'admin'],function (){
 
     // start auth route
     Route::get('login', [AdminLoginController::class,'adminLoginPage'])->name('login');
