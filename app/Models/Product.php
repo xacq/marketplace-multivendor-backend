@@ -68,6 +68,10 @@ class Product extends Model
         return $this->hasMany(ProductReview::class)->where('status', 1);
     }
 
+    public function leads(){
+        return $this->hasMany(ProductLead::class);
+    }
+
     protected $fillable = [
         'name',
         'short_name',
@@ -98,7 +102,9 @@ class Product extends Model
         'is_best',
         'status',
         'is_specification',
-        'approve_by_admin'
+        'approve_by_admin',
+        'product_type',
+        'reference_price',
     ];
 
 }

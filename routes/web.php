@@ -63,6 +63,7 @@ use App\Http\Controllers\WEB\Admin\LanguageController;
 use App\Http\Controllers\WEB\Admin\AdvertisementController;
 use App\Http\Controllers\WEB\Admin\FlashSaleController;
 use App\Http\Controllers\WEB\Admin\InventoryController;
+use App\Http\Controllers\WEB\Admin\AdminLeadController;
 
 use App\Http\Controllers\WEB\Seller\SellerDashboardController;
 use App\Http\Controllers\WEB\Seller\SellerProfileController;
@@ -76,6 +77,7 @@ use App\Http\Controllers\WEB\Seller\SellerProductReportControler;
 use App\Http\Controllers\WEB\Seller\SellerOrderController;
 use App\Http\Controllers\WEB\Seller\SellerMessageContoller;
 use App\Http\Controllers\WEB\Seller\InventoryController as SellerInventoryController;
+use App\Http\Controllers\WEB\Seller\SellerLeadController;
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CartController;
@@ -429,6 +431,12 @@ Route::group(['middleware' => ['maintainance']], function () {
         Route::post('add-stock', [SellerInventoryController::class, 'add_stock'])->name('add-stock');
         Route::delete('delete-stock/{id}', [SellerInventoryController::class, 'delete_stock'])->name('delete-stock');
 
+        // Leads
+        Route::get('leads', [SellerLeadController::class, 'index'])->name('leads.index');
+        Route::get('lead/{id}', [SellerLeadController::class, 'show'])->name('leads.show');
+        Route::put('lead-status/{id}', [SellerLeadController::class, 'updateStatus'])->name('leads.updateStatus');
+        Route::delete('lead/{id}', [SellerLeadController::class, 'destroy'])->name('leads.destroy');
+
     });
 
 
@@ -576,6 +584,12 @@ Route::group(['as'=> 'admin.', 'prefix' => 'admin'],function (){
     Route::get('product-export', [ProductController::class, 'product_export'])->name('product-export');
     Route::get('product-demo-export', [ProductController::class, 'product_demo_export'])->name('product-demo-export');
     Route::post('store-product-import', [ProductController::class, 'store_product_import'])->name('store-product-import');
+
+    // Leads Admin Routes
+    Route::get('leads', [AdminLeadController::class, 'index'])->name('leads.index');
+    Route::get('lead/{id}', [AdminLeadController::class, 'show'])->name('leads.show');
+    Route::put('lead-status/{id}', [AdminLeadController::class, 'updateStatus'])->name('leads.updateStatus');
+    Route::delete('lead/{id}', [AdminLeadController::class, 'destroy'])->name('leads.destroy');
 
 
     Route::get('product-variant/{id}', [ProductVariantController::class,'index'])->name('product-variant');

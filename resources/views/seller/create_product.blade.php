@@ -86,28 +86,41 @@
                                 </div>
 
                                 <div class="form-group col-12">
+                                    <label>Tipo de Producto <span class="text-danger">*</span></label>
+                                    <select name="product_type" id="product_type" class="form-control">
+                                        <option value="shop">Para Comprar Online (Tienda)</option>
+                                        <option value="contact">Para Contactar (Vehículos/Inmuebles)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-12">
                                     <label>{{__('admin.SKU')}} </label>
                                    <input type="text" class="form-control" name="sku">
                                 </div>
 
-                                <div class="form-group col-12">
+                                <div class="form-group col-12" id="price_container">
                                     <label>{{__('admin.Price')}} <span class="text-danger">*</span></label>
                                    <input type="text" class="form-control" name="price" value="{{ old('price') }}">
                                 </div>
 
-                                <div class="form-group col-12">
+                                <div class="form-group col-12" id="reference_price_container" style="display: none;">
+                                    <label>Precio de Referencia</label>
+                                   <input type="text" class="form-control" name="reference_price" value="{{ old('reference_price') }}">
+                                </div>
+
+                                <div class="form-group col-12" id="offer_price_container">
                                     <label>{{__('admin.Offer Price')}}</label>
                                    <input type="text" class="form-control" name="offer_price" value="{{ old('offer_price') }}">
                                 </div>
 
 
 
-                                <div class="form-group col-12">
+                                <div class="form-group col-12" id="quantity_container">
                                     <label>{{__('admin.Stock Quantity')}} <span class="text-danger">*</span></label>
                                    <input type="number" class="form-control" name="quantity" value="{{ old('quantity') }}">
                                 </div>
 
-                                <div class="form-group col-12">
+                                <div class="form-group col-12" id="weight_container">
                                     <label>{{__('admin.Weight')}}(g) <span class="text-danger">*</span></label>
                                    <input type="text" class="form-control" name="weight" value="{{ old('weight') }}">
                                 </div>
@@ -231,6 +244,26 @@
             $("#name").on("focusout",function(e){
                 $("#slug").val(convertToSlug($(this).val()));
             })
+
+            // Product Type Toggle
+            $("#product_type").on("change", function(){
+                var type = $(this).val();
+                if(type === 'contact') {
+                    $("#reference_price_container").show();
+                    $("#price_container").hide();
+                    $("#offer_price_container").hide();
+                    $("#quantity_container").hide();
+                    $("#weight_container").hide();
+                } else {
+                    $("#reference_price_container").hide();
+                    $("#price_container").show();
+                    $("#offer_price_container").show();
+                    $("#quantity_container").show();
+                    $("#weight_container").show();
+                }
+            });
+            // trigger on load
+            $("#product_type").trigger("change");
 
             $("#category").on("change",function(){
                 var categoryId = $("#category").val();

@@ -65,6 +65,7 @@ use App\Http\Controllers\Admin\MenuVisibilityController;
 use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\AdvertisementController;
 use App\Http\Controllers\Admin\FlashSaleController;
+use App\Http\Controllers\Admin\AdminLeadController;
 
 
 
@@ -80,6 +81,7 @@ use App\Http\Controllers\Seller\WithdrawController;
 use App\Http\Controllers\Seller\SellerProductReportControler;
 use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\Seller\SellerMessageContoller;
+use App\Http\Controllers\Seller\SellerLeadController;
 
 
 
@@ -93,6 +95,7 @@ use App\Http\Controllers\User\PaymentController;
 use App\Http\Controllers\User\PaypalController;
 use App\Http\Controllers\User\MessageController;
 use App\Http\Controllers\User\AddressCotroller;
+use App\Http\Controllers\User\ProductLeadController;
 
 
 
@@ -160,6 +163,8 @@ Route::group(['middleware' => ['maintainance']], function () {
     Route::post('subscribe-request', [HomeController::class, 'subscribeRequest'])->name('subscribe-request');
     Route::get('subscriber-verification/{token}', [HomeController::class, 'subscriberVerifcation'])->name('subscriber-verification');
 
+    Route::post('/product-lead', [ProductLeadController::class, 'store'])->name('product-lead');
+
     Route::get('/cart', [CartController::class, 'cart'])->name('cart');
     Route::get('/add-to-cart', [CartController::class, 'addToCart'])->name('add-to-cart');
     Route::get('/cart-clear', [CartController::class, 'cartClear'])->name('cart-clear');
@@ -179,6 +184,7 @@ Route::group(['middleware' => ['maintainance']], function () {
 
     Route::get('/login', [LoginController::class, 'loginPage'])->name('login');
     Route::post('/store-login', [LoginController::class, 'storeLogin'])->name('store-login');
+    Route::post('/guest-login', [LoginController::class, 'guestLogin'])->name('guest-login');
     Route::post('/resend-register-code', [RegisterController::class, 'resendRegisterCode'])->name('resend-register-code');
     Route::post('/store-register', [RegisterController::class, 'storeRegister'])->name('store-register');
     Route::get('/user-verification/{token}', [RegisterController::class, 'userVerification'])->name('user-verification');
@@ -317,6 +323,11 @@ Route::group(['middleware' => ['maintainance']], function () {
         Route::get('load-chat-box/{id}', [SellerMessageContoller::class, 'loadChatBox'])->name('load-chat-box');
         Route::get('load-new-message/{id}', [SellerMessageContoller::class, 'loadNewMessage'])->name('load-new-message');
         Route::get('send-message', [SellerMessageContoller::class, 'sendMessage'])->name('send-message');
+
+        Route::get('leads', [SellerLeadController::class, 'index']);
+        Route::get('lead/{id}', [SellerLeadController::class, 'show']);
+        Route::put('lead-status/{id}', [SellerLeadController::class, 'updateStatus']);
+        Route::delete('lead/{id}', [SellerLeadController::class, 'destroy']);
 
     });
 
@@ -689,6 +700,10 @@ Route::group(['as'=> 'api.admin.', 'prefix' => 'admin'],function (){
     Route::get('website-validation-language', [LanguageController::class, 'websiteValidationLanguage'])->name('website-validation-language');
     Route::post('update-validation-language', [LanguageController::class, 'updateValidationLanguage'])->name('update-validation-language');
 
+    Route::get('leads', [AdminLeadController::class, 'index']);
+    Route::get('lead/{id}', [AdminLeadController::class, 'show']);
+    Route::put('lead-status/{id}', [AdminLeadController::class, 'updateStatus']);
+    Route::delete('lead/{id}', [AdminLeadController::class, 'destroy']);
 
 });
 

@@ -39,6 +39,7 @@ use Cart;
 use Session;
 use Str;
 use Razorpay\Api\Api;
+use Razorpay\Api\Errors\SignatureVerificationError;
 use Exception;
 use Redirect;
 
@@ -71,6 +72,8 @@ class PaymentController extends Controller
         $user = Auth::guard('api')->user();
 
         $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+        if($total instanceof \Illuminate\Http\JsonResponse) { return $total; }
+        if(is_array($total) && isset($total['error']) && $total['error']) { return $total['response']; }
 
         $total_price = $total['total_price'];
         $coupon_price = $total['coupon_price'];
@@ -126,6 +129,8 @@ class PaymentController extends Controller
 
         $user = Auth::guard('api')->user();
         $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+        if($total instanceof \Illuminate\Http\JsonResponse) { return $total; }
+        if(is_array($total) && isset($total['error']) && $total['error']) { return $total['response']; }
 
         $total_price = $total['total_price'];
         $coupon_price = $total['coupon_price'];
@@ -192,6 +197,7 @@ class PaymentController extends Controller
         $user = Auth::guard('api')->user();
 
         $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+        if(isset($total['error']) && $total['error']) { return $total['response']; }
         $razorpay = RazorpayPayment::first();
         $total_price = $total['total_price'];
         $payable_amount = $total_price * $razorpay->currency_rate;
@@ -284,6 +290,7 @@ class PaymentController extends Controller
             $user = Auth::guard('api')->user();
 
             $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+            if(isset($total['error']) && $total['error']) { return $total['response']; }
 
             $total_price = $total['total_price'];
             $coupon_price = $total['coupon_price'];
@@ -375,6 +382,7 @@ class PaymentController extends Controller
             $user = Auth::guard('api')->user();
 
             $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+            if(isset($total['error']) && $total['error']) { return $total['response']; }
 
             $total_price = $total['total_price'];
             $coupon_price = $total['coupon_price'];
@@ -429,6 +437,7 @@ class PaymentController extends Controller
         Session::put('user', $user);
 
         $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+        if(isset($total['error']) && $total['error']) { return $total['response']; }
 
         $total_price = $total['total_price'];
         $coupon_price = $total['coupon_price'];
@@ -525,6 +534,7 @@ class PaymentController extends Controller
         $user = Auth::guard('api')->user();
 
         $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+        if(isset($total['error']) && $total['error']) { return $total['response']; }
         $total_price = $total['total_price'];
 
         $frontend_success_url = $request->frontend_success_url;
@@ -570,6 +580,7 @@ class PaymentController extends Controller
             $user = Auth::guard('api')->user();
 
             $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+            if(isset($total['error']) && $total['error']) { return $total['response']; }
 
             $total_price = $total['total_price'];
             $coupon_price = $total['coupon_price'];
@@ -780,6 +791,7 @@ class PaymentController extends Controller
         $user = Auth::guard('api')->user();
 
         $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+        if(isset($total['error']) && $total['error']) { return $total['response']; }
 
         $total_price = $total['total_price'];
         $coupon_price = $total['coupon_price'];
@@ -815,6 +827,7 @@ class PaymentController extends Controller
         $user = Auth::guard('api')->user();
 
         $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+        if(isset($total['error']) && $total['error']) { return $total['response']; }
         $total_price = $total['total_price'];
         $total_price = round($total_price * $sslcommerzPaymentInfo->currency_rate,2);
 
@@ -847,6 +860,7 @@ class PaymentController extends Controller
         $coupon = Session::get('coupon');
         $shipping_method_id = Session::get('shipping_method_id');
         $total = $this->calculateCartTotal($user, $coupon, $shipping_method_id);
+        if(isset($total['error']) && $total['error']) { return $total['response']; }
         $total_price = $total['total_price'];
 
         $sslcommerzPaymentInfo = SslcommerzPayment::first();
@@ -997,7 +1011,7 @@ class PaymentController extends Controller
         $cartProducts = ShoppingCart::with('product','variants.variantItem')->where('user_id', $user->id)->select('id','product_id','qty')->get();
         if($cartProducts->count() == 0){
             $notification = trans('Your shopping cart is empty');
-            return response()->json(['message' => $notification],403);
+            return ['error' => true, 'response' => response()->json(['message' => $notification], 403)];
         }
         foreach($cartProducts as $index => $cartProduct){
             $variantPrice = 0;
@@ -1058,7 +1072,7 @@ class PaymentController extends Controller
 
         $shipping = Shipping::find($request_shipping_method_id);
         if(!$shipping){
-            return response()->json(['message' => trans('Shipping method not found')],403);
+            return ['error' => true, 'response' => response()->json(['message' => trans('Shipping method not found')], 403)];
         }
 
         if($shipping->shipping_fee == 0){
@@ -1205,21 +1219,30 @@ class PaymentController extends Controller
 
 
     public function sendOrderSuccessMail($user, $total_price, $payment_method, $payment_status, $order, $order_details){
-        $setting = Setting::first();
+        try {
+            $setting = Setting::first();
 
-        MailHelper::setMailConfig();
+            MailHelper::setMailConfig();
 
-        $template=EmailTemplate::where('id',6)->first();
-        $subject=$template->subject;
-        $message=$template->description;
-        $message = str_replace('{{user_name}}',$user->name,$message);
-        $message = str_replace('{{total_amount}}',$setting->currency_icon.$total_price,$message);
-        $message = str_replace('{{payment_method}}',$payment_method,$message);
-        $message = str_replace('{{payment_status}}',$payment_status,$message);
-        $message = str_replace('{{order_status}}','Pending',$message);
-        $message = str_replace('{{order_date}}',$order->created_at->format('d F, Y'),$message);
-        $message = str_replace('{{order_detail}}',$order_details,$message);
-        Mail::to($user->email)->send(new OrderSuccessfully($message,$subject));
+            $template=EmailTemplate::where('id',6)->first();
+            if(!$template) return;
+
+            $subject=$template->subject;
+            $message=$template->description;
+            $message = str_replace('{{user_name}}',$user->name,$message);
+            $message = str_replace('{{total_amount}}',$setting->currency_icon.$total_price,$message);
+            $message = str_replace('{{payment_method}}',$payment_method,$message);
+            $message = str_replace('{{payment_status}}',$payment_status,$message);
+            $message = str_replace('{{order_status}}','Pending',$message);
+            $message = str_replace('{{order_date}}',$order->created_at->format('d F, Y'),$message);
+            $message = str_replace('{{order_detail}}',$order_details,$message);
+            Mail::to($user->email)->send(new OrderSuccessfully($message,$subject));
+        } catch (\Exception $e) {
+            \Log::error('Order confirmation email failed: ' . $e->getMessage(), [
+                'order_id' => $order->order_id,
+                'user_email' => $user->email,
+            ]);
+        }
     }
 }
 
