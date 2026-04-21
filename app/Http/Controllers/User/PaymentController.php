@@ -104,93 +104,107 @@ class PaymentController extends Controller
 
     }
 
-    public function payWithStripe(Request $request){
-
+    /**
+     * STEP 1 (PCI-Compliant flow): Create a Stripe PaymentIntent server-side.
+     * Returns client_secret to the frontend. Card data never touches this server.
+     */
+    public function createStripePaymentIntent(Request $request)
+    {
         $rules = [
-            'shipping_address_id'=>'required',
-            'billing_address_id'=>'required',
-            'shipping_method_id'=>'required',
-            'card_number'=>'required',
-            'year'=>'required',
-            'month'=>'required',
-            'cvv'=>'required',
+            'shipping_address_id' => 'required',
+            'billing_address_id'  => 'required',
+            'shipping_method_id'  => 'required',
+        ];
+        $this->validate($request, $rules);
+
+        $user  = Auth::guard('api')->user();
+        $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
+        if ($total instanceof \Illuminate\Http\JsonResponse) { return $total; }
+        if (is_array($total) && isset($total['error']) && $total['error']) { return $total['response']; }
+
+        $stripe        = StripePayment::first();
+        $total_price   = $total['total_price'];
+        $payableAmount = (int) round($total_price * $stripe->currency_rate * 100); // Stripe uses smallest currency unit (cents)
+
+        \Stripe\Stripe::setApiKey($stripe->stripe_secret);
+
+        try {
+            $intent = \Stripe\PaymentIntent::create([
+                'amount'               => $payableAmount,
+                'currency'             => strtolower($stripe->currency_code),
+                'automatic_payment_methods' => ['enabled' => true],
+                'description'          => env('APP_NAME') . ' Order',
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 403);
+        }
+
+        return response()->json([
+            'client_secret'      => $intent->client_secret,
+            'payment_intent_id'  => $intent->id,
+            'stripe_public_key'  => $stripe->stripe_key,
+        ], 200);
+    }
+
+    /**
+     * STEP 2 (PCI-Compliant flow): Verify the PaymentIntent completed on Stripe's side
+     * and create the order. Card data is NEVER received here.
+     */
+    public function payWithStripe(Request $request)
+    {
+        $rules = [
+            'shipping_address_id'  => 'required',
+            'billing_address_id'   => 'required',
+            'shipping_method_id'   => 'required',
+            'payment_intent_id'    => 'required',
         ];
         $customMessages = [
             'shipping_address_id.required' => trans('Shipping address is required'),
-            'billing_address_id.required' => trans('Billing address is required'),
-            'shipping_method_id.required' => trans('Shipping method is required'),
-            'card_number.required' => trans('Card number is required'),
-            'year.required' => trans('Year is required'),
-            'month.required' => trans('Month is required'),
-            'cvv.required' => trans('Cvv is required'),
+            'billing_address_id.required'  => trans('Billing address is required'),
+            'shipping_method_id.required'  => trans('Shipping method is required'),
+            'payment_intent_id.required'   => trans('Payment intent is required'),
         ];
+        $this->validate($request, $rules, $customMessages);
 
-        $this->validate($request, $rules,$customMessages);
-
-        $user = Auth::guard('api')->user();
+        $user  = Auth::guard('api')->user();
         $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
-        if($total instanceof \Illuminate\Http\JsonResponse) { return $total; }
-        if(is_array($total) && isset($total['error']) && $total['error']) { return $total['response']; }
+        if ($total instanceof \Illuminate\Http\JsonResponse) { return $total; }
+        if (is_array($total) && isset($total['error']) && $total['error']) { return $total['response']; }
 
         $total_price = $total['total_price'];
         $coupon_price = $total['coupon_price'];
         $shipping_fee = $total['shipping_fee'];
-        $productWeight = $total['productWeight'];
-        $shipping = $total['shipping'];
-
-        $totalProduct = ShoppingCart::with('variants')->where('user_id', $user->id)->sum('qty');
-        $setting = Setting::first();
-
-        $amount_real_currency = $total_price;
-        $amount_usd = round($total_price / $setting->currency_rate,2);
-        $currency_rate = $setting->currency_rate;
-        $currency_icon = $setting->currency_icon;
-        $currency_name = $setting->currency_name;
+        $shipping     = $total['shipping'];
 
         $stripe = StripePayment::first();
-        $payableAmount = round($total_price * $stripe->currency_rate,2);
-        Stripe\Stripe::setApiKey($stripe->stripe_secret);
+        \Stripe\Stripe::setApiKey($stripe->stripe_secret);
 
-        try{
-            $token = Stripe\Token::create([
-                'card' => [
-                    'number' => $request->card_number,
-                    'exp_month' => $request->month,
-                    'exp_year' => $request->year,
-                    'cvc' => $request->cvc,
-                ],
-            ]);
-        }catch (Exception $e) {
-            return response()->json(['error' => 'Please provide valid card information'],403);
+        try {
+            $intent = \Stripe\PaymentIntent::retrieve($request->payment_intent_id);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Could not verify payment: ' . $e->getMessage()], 403);
         }
 
-        if (!isset($token['id'])) {
-            return response()->json(['error' => 'Payment faild'],403);
+        if ($intent->status !== 'succeeded') {
+            return response()->json(['error' => 'Payment has not been completed. Status: ' . $intent->status], 403);
         }
 
-        $result = Stripe\Charge::create([
-            'card' => $token['id'],
-            'currency' => $stripe->currency_code,
-            'amount' => $payableAmount * 100,
-            'description' => env('APP_NAME'),
-        ]);
+        $totalProduct  = ShoppingCart::with('variants')->where('user_id', $user->id)->sum('qty');
+        $transaction_id = $intent->id; // store PaymentIntent ID as transaction reference
 
-        if($result['status'] != 'succeeded') {
-            return response()->json(['error' => 'Payment faild'],403);
-        }
-
-        $transaction_id = $result['balance_transaction'];
-        $order_result = $this->orderStore($user, $total_price, $totalProduct, 'Stripe', $transaction_id, 1, $shipping, $shipping_fee, $coupon_price, 0,$request->billing_address_id, $request->shipping_address_id);
+        $order_result = $this->orderStore(
+            $user, $total_price, $totalProduct,
+            'Stripe', $transaction_id, 1,
+            $shipping, $shipping_fee, $coupon_price, 0,
+            $request->billing_address_id, $request->shipping_address_id
+        );
 
         $this->sendOrderSuccessMail($user, $total_price, 'Stripe', 1, $order_result['order'], $order_result['order_details']);
 
-
-        $notification = trans('Payment Successfully');
-        $order = $order_result['order'];
+        $order    = $order_result['order'];
         $order_id = $order->order_id;
 
-        return response()->json(['message' => $notification, 'order_id' => $order_id],200);
-
+        return response()->json(['message' => trans('Payment Successfully'), 'order_id' => $order_id], 200);
     }
 
     public function razorpayOrder(Request $request){

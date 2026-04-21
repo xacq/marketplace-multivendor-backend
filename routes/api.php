@@ -234,6 +234,7 @@ Route::group(['middleware' => ['maintainance']], function () {
             Route::get('/', [CheckoutController::class, 'checkout'])->name('checkout');
 
             Route::post('/cash-on-delivery', [PaymentController::class, 'cashOnDelivery'])->name('cash-on-delivery');
+            Route::post('/stripe-payment-intent', [PaymentController::class, 'createStripePaymentIntent'])->name('stripe-payment-intent');
             Route::post('/pay-with-stripe', [PaymentController::class, 'payWithStripe'])->name('pay-with-stripe');
 
 
