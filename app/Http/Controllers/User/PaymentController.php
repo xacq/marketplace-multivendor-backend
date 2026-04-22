@@ -274,6 +274,7 @@ class PaymentController extends Controller
         $shipping_method_id = $request->shipping_method_id;
         $coupon = $request->coupon;
         $token = $request->token;
+        Session::put('vendor_id', $request->vendor_id);
 
         return view('razorpay_webview', compact('orderId','razorpay','payable_amount','frontend_success_url','frontend_faild_url','request_from','shipping_address_id','billing_address_id','shipping_method_id','coupon','token'));
     }
@@ -361,6 +362,7 @@ class PaymentController extends Controller
         $shipping_method_id = $request->shipping_method_id;
         $coupon = $request->coupon;
         $token = $request->token;
+        Session::put('vendor_id', $request->vendor_id);
 
         return view('flutterwave_webview', compact('flutterwave','user','total_price','frontend_success_url','frontend_faild_url','request_from','shipping_address_id','billing_address_id','shipping_method_id','coupon','token'));
     }
@@ -448,6 +450,7 @@ class PaymentController extends Controller
         Session::put('billing_address_id', $request->billing_address_id);
         Session::put('shipping_method_id', $request->shipping_method_id);
         Session::put('coupon', $request->coupon);
+        Session::put('vendor_id', $request->vendor_id);
         Session::put('user', $user);
 
         $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
@@ -559,6 +562,7 @@ class PaymentController extends Controller
         $shipping_method_id = $request->shipping_method_id;
         $coupon = $request->coupon;
         $token = $request->token;
+        Session::put('vendor_id', $request->vendor_id);
 
         return view('paystack_webview', compact('paystack','user','total_price','frontend_success_url','frontend_faild_url','request_from','shipping_address_id','billing_address_id','shipping_method_id','coupon','token'));
     }
@@ -645,6 +649,7 @@ class PaymentController extends Controller
         Session::put('billing_address_id', $request->billing_address_id);
         Session::put('shipping_method_id', $request->shipping_method_id);
         Session::put('coupon', $request->coupon);
+        Session::put('vendor_id', $request->vendor_id);
         Session::put('user', $user);
 
         $total = $this->calculateCartTotal($user, $request->coupon, $request->shipping_method_id);
@@ -861,6 +866,7 @@ class PaymentController extends Controller
         Session::put('billing_address_id', $request->billing_address_id);
         Session::put('shipping_method_id', $request->shipping_method_id);
         Session::put('coupon', $request->coupon);
+        Session::put('vendor_id', $request->vendor_id);
         Session::put('user', $user);
 
 
@@ -1016,13 +1022,21 @@ class PaymentController extends Controller
 
 
 
-    public function calculateCartTotal($user, $request_coupon, $request_shipping_method_id){
+    public function calculateCartTotal($user, $request_coupon, $request_shipping_method_id, $vendor_id = null){
         $total_price = 0;
         $coupon_price = 0;
         $shipping_fee = 0;
         $productWeight = 0;
+        
+        $vendor_id = $vendor_id ?? request()->vendor_id ?? Session::get('vendor_id');
 
-        $cartProducts = ShoppingCart::with('product','variants.variantItem')->where('user_id', $user->id)->select('id','product_id','qty')->get();
+        $query = ShoppingCart::with('product','variants.variantItem')->where('user_id', $user->id);
+        if ($vendor_id !== null) {
+            $query->whereHas('product', function($q) use($vendor_id) { 
+                $q->where('vendor_id', $vendor_id); 
+            });
+        }
+        $cartProducts = $query->select('id','product_id','qty')->get();
         if($cartProducts->count() == 0){
             $notification = trans('Your shopping cart is empty');
             return ['error' => true, 'response' => response()->json(['message' => $notification], 403)];
@@ -1109,12 +1123,23 @@ class PaymentController extends Controller
         return $arr;
     }
 
-    public function orderStore($user, $total_price, $totalProduct, $payment_method, $transaction_id, $paymetn_status, $shipping, $shipping_fee, $coupon_price, $cash_on_delivery,$billing_address_id,$shipping_address_id){
-        $cartProducts = ShoppingCart::with('product','variants.variantItem')->where('user_id', $user->id)->select('id','product_id','qty')->get();
+    public function orderStore($user, $total_price, $totalProduct_ignored, $payment_method, $transaction_id, $paymetn_status, $shipping, $shipping_fee, $coupon_price, $cash_on_delivery,$billing_address_id,$shipping_address_id, $vendor_id = null){
+        
+        $vendor_id = $vendor_id ?? request()->vendor_id ?? Session::get('vendor_id');
+
+        $query = ShoppingCart::with('product','variants.variantItem')->where('user_id', $user->id);
+        if ($vendor_id !== null) {
+            $query->whereHas('product', function($q) use($vendor_id) { 
+                $q->where('vendor_id', $vendor_id); 
+            });
+        }
+        $cartProducts = $query->select('id','product_id','qty')->get();
         if($cartProducts->count() == 0){
             $notification = trans('Your shopping cart is empty');
             return response()->json(['message' => $notification],403);
         }
+
+        $totalProduct = $cartProducts->sum('qty');
 
         $order = new Order();
         $orderId = substr(rand(0,time()),0,10);

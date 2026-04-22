@@ -29,9 +29,7 @@ class ShoppingCart extends Model
 
 
     public function product(){
-
-        return $this->belongsTo(Product::class)->select(['id','name','short_name','price','offer_price','thumb_image','slug','weight']);
-
+        return $this->belongsTo(Product::class)->select(['id','name','short_name','price','offer_price','thumb_image','slug','weight','vendor_id'])->with('seller:id,user_id,shop_name');
     }
 
 
