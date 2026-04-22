@@ -16,6 +16,7 @@ use App\Models\Currency;
 use App\Models\Setting;
 use App\Models\PaymongoPayment;
 use App\Models\SslcommerzPayment;
+use App\Models\DeunaPayment;
 use Image;
 use File;
 class PaymentMethodController extends Controller
@@ -35,12 +36,13 @@ class PaymentMethodController extends Controller
         $instamojo = InstamojoPayment::first();
         $paymongo = PaymongoPayment::first();
         $sslcommerz = SslcommerzPayment::first();
+        $deuna = DeunaPayment::first();
 
         $countires = CurrencyCountry::orderBy('name','asc')->get();
         $currencies = Currency::orderBy('name','asc')->get();
         $setting = Setting::first();
 
-        return view('admin.payment_method', compact('paypal','stripe','razorpay','bank','paystackAndMollie','flutterwave','instamojo','countires','currencies','setting','paymongo','sslcommerz'));
+        return view('admin.payment_method', compact('paypal','stripe','razorpay','bank','paystackAndMollie','flutterwave','instamojo','countires','currencies','setting','paymongo','sslcommerz', 'deuna'));
 
     }
 
@@ -369,4 +371,13 @@ class PaymentMethodController extends Controller
 
 
 
+    public function updateDeuna(Request $request){
+        $deuna = DeunaPayment::first();
+        $deuna->status = $request->status ? 1 : 0;
+        $deuna->save();
+
+        $notification=trans('admin_validation.Updated Successfully');
+        $notification=array('messege'=>$notification,'alert-type'=>'success');
+        return redirect()->back()->with($notification);
+    }
 }

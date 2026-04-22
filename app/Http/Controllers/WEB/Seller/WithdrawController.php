@@ -8,6 +8,9 @@ use App\Models\WithdrawMethod;
 use App\Models\SellerWithdraw;
 use App\Models\OrderProduct;
 use App\Models\Setting;
+use App\Models\StripePayment;
+use Stripe\Stripe;
+use Stripe\Balance;
 use Auth;
 class WithdrawController extends Controller
 {
@@ -21,7 +24,23 @@ class WithdrawController extends Controller
         $seller = $user->seller;
         $withdraws = SellerWithdraw::where('seller_id',$seller->id)->get();
         $setting = Setting::first();
-        return view('seller.withdraw', compact('withdraws','setting'));
+
+        $stripeBalance = null;
+        if ($seller->stripe_account_id) {
+            $stripeConfig = StripePayment::first();
+            if ($stripeConfig && $stripeConfig->stripe_secret) {
+                try {
+                    Stripe::setApiKey($stripeConfig->stripe_secret);
+                    $balance = Balance::retrieve(['stripe_account' => $seller->stripe_account_id]);
+                    // Summarize available balance across currencies (or just primary)
+                    $stripeBalance = $balance->available; 
+                } catch (\Exception $e) {
+                    \Log::error("Stripe Balance error: " . $e->getMessage());
+                }
+            }
+        }
+
+        return view('seller.withdraw', compact('withdraws','setting', 'stripeBalance'));
 
     }
 

@@ -921,6 +921,7 @@ class ComposerStaticInitecd7510ce13aab5ade838b17a74ea378
         'App\\Models\\DeliveryManWithdraw' => __DIR__ . '/../..' . '/app/Models/DeliveryManWithdraw.php',
         'App\\Models\\DeliveryManWithdrawMethod' => __DIR__ . '/../..' . '/app/Models/DeliveryManWithdrawMethod.php',
         'App\\Models\\DeliveryMessage' => __DIR__ . '/../..' . '/app/Models/DeliveryMessage.php',
+        'App\\Models\\DeunaPayment' => __DIR__ . '/../..' . '/app/Models/DeunaPayment.php',
         'App\\Models\\EmailConfiguration' => __DIR__ . '/../..' . '/app/Models/EmailConfiguration.php',
         'App\\Models\\EmailTemplate' => __DIR__ . '/../..' . '/app/Models/EmailTemplate.php',
         'App\\Models\\ErrorPage' => __DIR__ . '/../..' . '/app/Models/ErrorPage.php',

@@ -1,9 +1,9 @@
-name: Deploy to Production
+name: Deploy Backend to Production
 
 on:
   push:
     branches:
-      - main
+      - main-fulfillec
 
 jobs:
   deploy:
@@ -11,13 +11,17 @@ jobs:
     environment: production
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          port: ${{ secrets.SSH_PORT }}
+          host: ${{ secrets.SSH_HOST_FULFILLEC }}
+          username: ${{ secrets.SSH_USER_FULFILLEC }}
+          password: ${{ secrets.SSH_PASSWORD_FULFILLEC }}
+          port: 22
           script: |
-            bash ${{ secrets.DEPLOY_PATH }}/deploy.sh
+            cd /www/wwwroot/storead.fulfillec.com
+            git pull origin main-fulfillec
+            bash deploy.sh

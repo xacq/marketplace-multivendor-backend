@@ -267,6 +267,7 @@ return array(
     'App\\Models\\DeliveryManWithdraw' => $baseDir . '/app/Models/DeliveryManWithdraw.php',
     'App\\Models\\DeliveryManWithdrawMethod' => $baseDir . '/app/Models/DeliveryManWithdrawMethod.php',
     'App\\Models\\DeliveryMessage' => $baseDir . '/app/Models/DeliveryMessage.php',
+    'App\\Models\\DeunaPayment' => $baseDir . '/app/Models/DeunaPayment.php',
     'App\\Models\\EmailConfiguration' => $baseDir . '/app/Models/EmailConfiguration.php',
     'App\\Models\\EmailTemplate' => $baseDir . '/app/Models/EmailTemplate.php',
     'App\\Models\\ErrorPage' => $baseDir . '/app/Models/ErrorPage.php',

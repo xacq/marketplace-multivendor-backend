@@ -290,7 +290,8 @@ Route::group(['middleware' => ['maintainance']], function () {
         Route::put('update-seller-shop',[SellerProfileController::class,'updateSellerSop'])->name('update-seller-shop');
 
         Route::put('remove-seller-social-link/{id}',[SellerProfileController::class,'removeSellerSocialLink'])->name('remove-seller-social-link');
-
+        Route::get('stripe-onboard',[SellerProfileController::class,'redirectToStripe'])->name('stripe-onboard');
+        Route::get('stripe-callback',[SellerProfileController::class,'handleStripeCallback'])->name('stripe-callback');
         Route::get('email-history',[SellerProfileController::class,'emailHistory'])->name('email-history');
 
 
@@ -1083,6 +1084,7 @@ Route::group(['as'=> 'admin.', 'prefix' => 'admin'],function (){
     Route::put('update-cash-on-delivery',[PaymentMethodController::class,'updateCashOnDelivery'])->name('update-cash-on-delivery');
 
     Route::put('update-sslcommerz',[PaymentMethodController::class,'updateSslcommerz'])->name('update-sslcommerz');
+    Route::put('update-deuna',[PaymentMethodController::class,'updateDeuna'])->name('update-deuna');
 
     Route::resource('mega-menu-category', MegaMenuController::class);
 

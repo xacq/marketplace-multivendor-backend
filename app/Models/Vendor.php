@@ -9,8 +9,8 @@ class Vendor extends Model
 {
     use HasFactory;
 
-
     protected $appends = ['averageRating'];
+    protected $fillable = ['stripe_account_id', 'bank_account_info', 'deuna_link', 'deuna_api_key', 'deuna_api_secret'];
 
     public function getAverageRatingAttribute()
     {

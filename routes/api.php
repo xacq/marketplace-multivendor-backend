@@ -47,40 +47,40 @@ use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\MegaMenuController;
-use App\Http\Controllers\Admin\MegaMenuSubCategoryController;
-use App\Http\Controllers\Admin\SliderController;
-use App\Http\Controllers\Admin\HomePageController;
-use App\Http\Controllers\Admin\ShippingMethodController;
-use App\Http\Controllers\Admin\WithdrawMethodController;
-use App\Http\Controllers\Admin\SellerWithdrawController;
-use App\Http\Controllers\Admin\ProductReportController;
-use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\CouponController;
-use App\Http\Controllers\Admin\BreadcrumbController;
-use App\Http\Controllers\Admin\FooterController;
-use App\Http\Controllers\Admin\FooterSocialLinkController;
-use App\Http\Controllers\Admin\FooterLinkController;
-use App\Http\Controllers\Admin\HomepageVisibilityController;
-use App\Http\Controllers\Admin\MenuVisibilityController;
-use App\Http\Controllers\Admin\LanguageController;
-use App\Http\Controllers\Admin\AdvertisementController;
-use App\Http\Controllers\Admin\FlashSaleController;
-use App\Http\Controllers\Admin\AdminLeadController;
+use App\Http\Controllers\WEB\Admin\MegaMenuSubCategoryController;
+use App\Http\Controllers\WEB\Admin\SliderController;
+use App\Http\Controllers\WEB\Admin\HomePageController;
+use App\Http\Controllers\WEB\Admin\ShippingMethodController;
+use App\Http\Controllers\WEB\Admin\WithdrawMethodController;
+use App\Http\Controllers\WEB\Admin\SellerWithdrawController;
+use App\Http\Controllers\WEB\Admin\ProductReportController;
+use App\Http\Controllers\WEB\Admin\OrderController;
+use App\Http\Controllers\WEB\Admin\CouponController;
+use App\Http\Controllers\WEB\Admin\BreadcrumbController;
+use App\Http\Controllers\WEB\Admin\FooterController;
+use App\Http\Controllers\WEB\Admin\FooterSocialLinkController;
+use App\Http\Controllers\WEB\Admin\FooterLinkController;
+use App\Http\Controllers\WEB\Admin\HomepageVisibilityController;
+use App\Http\Controllers\WEB\Admin\MenuVisibilityController;
+use App\Http\Controllers\WEB\Admin\LanguageController;
+use App\Http\Controllers\WEB\Admin\AdvertisementController;
+use App\Http\Controllers\WEB\Admin\FlashSaleController;
+use App\Http\Controllers\WEB\Admin\AdminLeadController;
 
 
 
 
-use App\Http\Controllers\Seller\SellerDashboardController;
-use App\Http\Controllers\Seller\SellerProfileController;
-use App\Http\Controllers\Seller\SellerProductController;
-use App\Http\Controllers\Seller\SellerProductGalleryController;
-use App\Http\Controllers\Seller\SellerProductVariantController;
-use App\Http\Controllers\Seller\SellerProductVariantItemController;
-use App\Http\Controllers\Seller\SellerProductReviewController;
-use App\Http\Controllers\Seller\WithdrawController;
-use App\Http\Controllers\Seller\SellerProductReportControler;
-use App\Http\Controllers\Seller\SellerOrderController;
-use App\Http\Controllers\Seller\SellerMessageContoller;
+use App\Http\Controllers\WEB\Seller\SellerDashboardController;
+use App\Http\Controllers\WEB\Seller\SellerProfileController;
+use App\Http\Controllers\WEB\Seller\SellerProductController;
+use App\Http\Controllers\WEB\Seller\SellerProductGalleryController;
+use App\Http\Controllers\WEB\Seller\SellerProductVariantController;
+use App\Http\Controllers\WEB\Seller\SellerProductVariantItemController;
+use App\Http\Controllers\WEB\Seller\SellerProductReviewController;
+use App\Http\Controllers\WEB\Seller\WithdrawController;
+use App\Http\Controllers\WEB\Seller\SellerProductReportControler;
+use App\Http\Controllers\WEB\Seller\SellerOrderController;
+use App\Http\Controllers\WEB\Seller\SellerMessageContoller;
 use App\Http\Controllers\Seller\SellerLeadController;
 
 
@@ -232,6 +232,7 @@ Route::group(['middleware' => ['maintainance']], function () {
 
         Route::group(['as'=> 'api.checkout.', 'prefix' => 'checkout'],function (){
             Route::get('/', [CheckoutController::class, 'checkout'])->name('checkout');
+            Route::get('/deuna-dynamic-link', [CheckoutController::class, 'deunaDynamicLink'])->name('deuna-dynamic-link');
 
             Route::post('/cash-on-delivery', [PaymentController::class, 'cashOnDelivery'])->name('cash-on-delivery');
             Route::post('/stripe-payment-intent', [PaymentController::class, 'createStripePaymentIntent'])->name('stripe-payment-intent');

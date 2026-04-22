@@ -182,6 +182,17 @@ class SellerProfileController extends Controller
         $seller->greeting_msg = $request->greeting_msg;
         $seller->seo_title = $request->seo_title ? $request->seo_title : $request->shop_name;
         $seller->seo_description = $request->seo_description ? $request->seo_description : $request->shop_name;
+        
+        if ($request->has('stripe_account_id')) {
+            $seller->stripe_account_id = $request->stripe_account_id;
+        }
+        if ($request->has('bank_account_info')) {
+            $seller->bank_account_info = $request->bank_account_info;
+        }
+        if ($request->has('deuna_link')) {
+            $seller->deuna_link = $request->deuna_link;
+        }
+
         $seller->save();
 
         if($request->banner_image){

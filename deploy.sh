@@ -1,47 +1,26 @@
 #!/bin/bash
-
-# =============================================================
-# deploy.sh — Script de despliegue para Bagisto en producción
-# Ubicación en el servidor: /home/keywordcv/test.keywordcv.com/deploy.sh
-# =============================================================
-
 set -e
 
-APP_DIR="/home/keywordcv/test.keywordcv.com"
+echo "Starting Deployment for Backend..."
 
-echo "🚀 Iniciando deploy..."
+# Navegar al directorio del proyecto
+cd /www/wwwroot/storead.fulfillec.com
 
-cd "$APP_DIR"
+# Setup .env si no existe
+if [ ! -f .env ]; then
+    cp .env.production .env
+    echo ".env created from .env.production"
+fi
 
-echo "⏸️  Modo mantenimiento ON"
-php artisan down --refresh=15 --retry=60
+# Instalar dependencias
+composer install --no-dev --optimize-autoloader
 
-echo "📦 Pulling desde GitHub..."
-git pull origin main
+# Ejecutar migraciones
+php artisan migrate --force
 
-echo "📚 Instalando dependencias..."
-php /opt/cpanel/ea-wappspector/composer.phar install --no-dev --optimize-autoloader --no-interaction
-
-echo "🧹 Limpiando cachés..."
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-php artisan event:clear
-
-echo "⚡ Cacheando configuración...."
+# Limpiar y reconstruir caché
 php artisan config:cache
-php artisan route:cache || true
-php artisan event:cache
+php artisan route:cache
 php artisan view:cache
 
-echo "🔗 Enlazando storage...."
-php artisan storage:link 2>/dev/null || true
-
-echo "🔒 Ajustando permisos...."
-chmod -R 775 storage bootstrap/cache
-
-echo "✅ Modo mantenimiento OFF"
-php artisan up
-
-echo "🎉 Deploy completado exitosamente."
+echo "Deployment finished successfully!"
