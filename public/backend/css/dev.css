@@ -7,8 +7,113 @@
     font-size: 15px !important;
 }
 
+/* ===== FULFILLEC BRAND IDENTITY ===== */
+
+/* --- Botones --- */
 .btn-primary {
-    background-color: #2046DA !important;
+    background-color: #28c3c8 !important;
+    border-color: #28c3c8 !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #1f6f78 !important;
+    border-color: #1f6f78 !important;
+}
+
+/* --- Sidebar dark (azul petróleo) --- */
+.main-sidebar {
+    background-color: #1a4a52 !important;
+}
+.main-sidebar .sidebar-brand a {
+    color: #ffffff !important;
+}
+.main-sidebar .sidebar-menu li.menu-header {
+    color: rgba(255,255,255,0.4) !important;
+}
+.main-sidebar .sidebar-menu li a {
+    color: rgba(255,255,255,0.75) !important;
+}
+.main-sidebar .sidebar-menu li a:hover {
+    background-color: rgba(255,255,255,0.08) !important;
+    color: #ffffff !important;
+}
+.main-sidebar .sidebar-menu li.active > a {
+    color: #ffffff !important;
+    background-color: #28c3c8 !important;
+    font-weight: 600;
+}
+.main-sidebar .sidebar-menu li ul.dropdown-menu {
+    background-color: rgba(0,0,0,0.15) !important;
+}
+.main-sidebar .sidebar-menu li ul.dropdown-menu li a {
+    color: rgba(255,255,255,0.65) !important;
+}
+.main-sidebar .sidebar-menu li ul.dropdown-menu li a:hover {
+    color: #ffffff !important;
+    background-color: rgba(40,195,200,0.2) !important;
+}
+.main-sidebar .sidebar-menu li ul.dropdown-menu li.active > a {
+    color: #28c3c8 !important;
+    font-weight: 600;
+}
+/* sidebar-style-1 active */
+body:not(.sidebar-mini) .sidebar-style-1 .sidebar-menu li.active a {
+    background-color: #28c3c8 !important;
+    color: #fff !important;
+}
+body:not(.sidebar-mini) .sidebar-style-1 .sidebar-menu li.active ul.dropdown-menu li a {
+    color: rgba(255,255,255,0.75) !important;
+}
+/* sidebar-style-2 accent line */
+body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu > li.active > a:before {
+    background-color: #f59e0b !important;
+}
+/* sidebar mini */
+body.sidebar-mini .main-sidebar .sidebar-menu > li.active > a {
+    background-color: #28c3c8 !important;
+    box-shadow: 0 4px 8px rgba(40,195,200,0.4) !important;
+}
+
+/* --- Navbar / Header --- */
+.navbar-bg {
+    background-color: #1f6f78 !important;
+}
+.navbar.active {
+    background-color: #1f6f78 !important;
+}
+.navbar .nav-link {
+    color: rgba(255,255,255,0.85) !important;
+}
+.navbar .nav-link:hover {
+    color: #ffffff !important;
+}
+.navbar .navbar-brand {
+    color: #ffffff !important;
+}
+
+/* --- Footer --- */
+.main-footer {
+    border-top: 2px solid #28c3c8 !important;
+    color: #6c757d;
+}
+.main-footer a {
+    color: #1f6f78 !important;
+    font-weight: 600;
+}
+.main-footer a:hover {
+    color: #28c3c8 !important;
+}
+
+/* --- Scrollbar del sidebar --- */
+.main-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.main-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.main-sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(40,195,200,0.4);
+    border-radius: 4px;
 }
 
 .btn-danger {
@@ -128,7 +233,7 @@ img.admin-banner-img {
 }
 
 .media span {
-    background: #2a9cf5;
+    background: #28c3c8;
     color: #fff;
     width: 20px;
     height: 20px;
