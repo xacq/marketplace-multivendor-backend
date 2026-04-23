@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('deuna_payments')) {
+            return;
+        }
+
         Schema::create('deuna_payments', function (Blueprint $table) {
             $table->id();
             $table->integer('status')->default(0);
