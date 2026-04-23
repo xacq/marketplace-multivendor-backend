@@ -18,6 +18,9 @@ php -d disable_functions="" /usr/local/bin/composer install --no-dev --optimize-
 # Ejecutar migraciones
 php artisan migrate --force
 
+# Storage link
+php artisan storage:link --force
+
 # Limpiar y reconstruir caché
 php artisan config:cache
 php artisan view:cache
