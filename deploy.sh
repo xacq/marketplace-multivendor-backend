@@ -13,14 +13,13 @@ if [ ! -f .env ]; then
 fi
 
 # Instalar dependencias
-composer install --no-dev --optimize-autoloader
+php -d disable_functions="" /usr/local/bin/composer install --no-dev --optimize-autoloader
 
 # Ejecutar migraciones
 php artisan migrate --force
 
 # Limpiar y reconstruir caché
 php artisan config:cache
-php artisan route:cache
 php artisan view:cache
 
 echo "Deployment finished successfully!"
