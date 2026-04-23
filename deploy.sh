@@ -19,7 +19,9 @@ php -d disable_functions="" /usr/local/bin/composer install --no-dev --optimize-
 php artisan migrate --force
 
 # Storage link
-php artisan storage:link --force
+if [ ! -L public/storage ]; then
+    ln -sf "$(pwd)/storage/app/public" public/storage
+fi
 
 # Limpiar y reconstruir caché
 php artisan config:cache
