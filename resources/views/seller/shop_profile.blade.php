@@ -155,6 +155,48 @@
                             <textarea name="seo_description" class="form-control text-area-5" id="" cols="30" rows="10">{{ $seller->seo_description }}</textarea>
                         </div>
 
+                        <hr class="col-12">
+                        <div class="col-12">
+                            <h5>{{__('admin.Payment Information')}}</h5>
+                        </div>
+
+                        <div class="form-group col-12">
+                            <label>{{__('admin.Bank Account Information')}}</label>
+                            <textarea name="bank_account_info" class="form-control text-area-5" cols="30" rows="5">{{ $seller->bank_account_info }}</textarea>
+                            <small class="text-muted">{{ __('admin.Enter your bank details for direct transfers.') }}</small>
+                        </div>
+
+                        <div class="form-group col-12">
+                            <label>{{__('admin.Deuna Dynamic Payment')}} (API)</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>{{__('admin.API Key')}}</label>
+                                    <input type="text" class="form-control" name="deuna_api_key" value="{{ $seller->deuna_api_key }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>{{__('admin.API Secret')}}</label>
+                                    <input type="password" class="form-control" name="deuna_api_secret" value="{{ $seller->deuna_api_secret }}">
+                                </div>
+                            </div>
+                            <small class="text-muted">{{ __('admin.Required to generate dynamic payment links based on checkout total.') }}</small>
+                        </div>
+
+                        <div class="form-group col-12">
+                            <label>{{__('admin.Stripe Connect')}}</label>
+                            @if($seller->stripe_account_id)
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle"></i> {{ __('admin.Stripe Account Connected') }} (ID: {{ $seller->stripe_account_id }})
+                                </div>
+                            @else
+                                <div>
+                                    <a href="{{ route('seller.stripe-onboard') }}" class="btn btn-dark">
+                                        <i class="fab fa-stripe"></i> {{ __('admin.Connect with Stripe') }}
+                                    </a>
+                                </div>
+                                <small class="text-muted">{{ __('admin.Standard onboarding to receive automated payments.') }}</small>
+                            @endif
+                        </div>
+
                     </div>
                     <div class="row">
                         <div class="col-12">

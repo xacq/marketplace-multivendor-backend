@@ -47,39 +47,41 @@ use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\MegaMenuController;
-use App\Http\Controllers\Admin\MegaMenuSubCategoryController;
-use App\Http\Controllers\Admin\SliderController;
-use App\Http\Controllers\Admin\HomePageController;
-use App\Http\Controllers\Admin\ShippingMethodController;
-use App\Http\Controllers\Admin\WithdrawMethodController;
-use App\Http\Controllers\Admin\SellerWithdrawController;
-use App\Http\Controllers\Admin\ProductReportController;
-use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\CouponController;
-use App\Http\Controllers\Admin\BreadcrumbController;
-use App\Http\Controllers\Admin\FooterController;
-use App\Http\Controllers\Admin\FooterSocialLinkController;
-use App\Http\Controllers\Admin\FooterLinkController;
-use App\Http\Controllers\Admin\HomepageVisibilityController;
-use App\Http\Controllers\Admin\MenuVisibilityController;
-use App\Http\Controllers\Admin\LanguageController;
-use App\Http\Controllers\Admin\AdvertisementController;
-use App\Http\Controllers\Admin\FlashSaleController;
+use App\Http\Controllers\WEB\Admin\MegaMenuSubCategoryController;
+use App\Http\Controllers\WEB\Admin\SliderController;
+use App\Http\Controllers\WEB\Admin\HomePageController;
+use App\Http\Controllers\WEB\Admin\ShippingMethodController;
+use App\Http\Controllers\WEB\Admin\WithdrawMethodController;
+use App\Http\Controllers\WEB\Admin\SellerWithdrawController;
+use App\Http\Controllers\WEB\Admin\ProductReportController;
+use App\Http\Controllers\WEB\Admin\OrderController;
+use App\Http\Controllers\WEB\Admin\CouponController;
+use App\Http\Controllers\WEB\Admin\BreadcrumbController;
+use App\Http\Controllers\WEB\Admin\FooterController;
+use App\Http\Controllers\WEB\Admin\FooterSocialLinkController;
+use App\Http\Controllers\WEB\Admin\FooterLinkController;
+use App\Http\Controllers\WEB\Admin\HomepageVisibilityController;
+use App\Http\Controllers\WEB\Admin\MenuVisibilityController;
+use App\Http\Controllers\WEB\Admin\LanguageController;
+use App\Http\Controllers\WEB\Admin\AdvertisementController;
+use App\Http\Controllers\WEB\Admin\FlashSaleController;
+use App\Http\Controllers\WEB\Admin\AdminLeadController;
 
 
 
 
-use App\Http\Controllers\Seller\SellerDashboardController;
-use App\Http\Controllers\Seller\SellerProfileController;
-use App\Http\Controllers\Seller\SellerProductController;
-use App\Http\Controllers\Seller\SellerProductGalleryController;
-use App\Http\Controllers\Seller\SellerProductVariantController;
-use App\Http\Controllers\Seller\SellerProductVariantItemController;
-use App\Http\Controllers\Seller\SellerProductReviewController;
-use App\Http\Controllers\Seller\WithdrawController;
-use App\Http\Controllers\Seller\SellerProductReportControler;
-use App\Http\Controllers\Seller\SellerOrderController;
-use App\Http\Controllers\Seller\SellerMessageContoller;
+use App\Http\Controllers\WEB\Seller\SellerDashboardController;
+use App\Http\Controllers\WEB\Seller\SellerProfileController;
+use App\Http\Controllers\WEB\Seller\SellerProductController;
+use App\Http\Controllers\WEB\Seller\SellerProductGalleryController;
+use App\Http\Controllers\WEB\Seller\SellerProductVariantController;
+use App\Http\Controllers\WEB\Seller\SellerProductVariantItemController;
+use App\Http\Controllers\WEB\Seller\SellerProductReviewController;
+use App\Http\Controllers\WEB\Seller\WithdrawController;
+use App\Http\Controllers\WEB\Seller\SellerProductReportControler;
+use App\Http\Controllers\WEB\Seller\SellerOrderController;
+use App\Http\Controllers\WEB\Seller\SellerMessageContoller;
+use App\Http\Controllers\Seller\SellerLeadController;
 
 
 
@@ -93,6 +95,7 @@ use App\Http\Controllers\User\PaymentController;
 use App\Http\Controllers\User\PaypalController;
 use App\Http\Controllers\User\MessageController;
 use App\Http\Controllers\User\AddressCotroller;
+use App\Http\Controllers\User\ProductLeadController;
 
 
 
@@ -160,6 +163,8 @@ Route::group(['middleware' => ['maintainance']], function () {
     Route::post('subscribe-request', [HomeController::class, 'subscribeRequest'])->name('subscribe-request');
     Route::get('subscriber-verification/{token}', [HomeController::class, 'subscriberVerifcation'])->name('subscriber-verification');
 
+    Route::post('/product-lead', [ProductLeadController::class, 'store'])->name('product-lead');
+
     Route::get('/cart', [CartController::class, 'cart'])->name('cart');
     Route::get('/add-to-cart', [CartController::class, 'addToCart'])->name('add-to-cart');
     Route::get('/cart-clear', [CartController::class, 'cartClear'])->name('cart-clear');
@@ -179,6 +184,7 @@ Route::group(['middleware' => ['maintainance']], function () {
 
     Route::get('/login', [LoginController::class, 'loginPage'])->name('login');
     Route::post('/store-login', [LoginController::class, 'storeLogin'])->name('store-login');
+    Route::post('/guest-login', [LoginController::class, 'guestLogin'])->name('guest-login');
     Route::post('/resend-register-code', [RegisterController::class, 'resendRegisterCode'])->name('resend-register-code');
     Route::post('/store-register', [RegisterController::class, 'storeRegister'])->name('store-register');
     Route::get('/user-verification/{token}', [RegisterController::class, 'userVerification'])->name('user-verification');
@@ -226,8 +232,10 @@ Route::group(['middleware' => ['maintainance']], function () {
 
         Route::group(['as'=> 'api.checkout.', 'prefix' => 'checkout'],function (){
             Route::get('/', [CheckoutController::class, 'checkout'])->name('checkout');
+            Route::get('/deuna-dynamic-link', [CheckoutController::class, 'deunaDynamicLink'])->name('deuna-dynamic-link');
 
             Route::post('/cash-on-delivery', [PaymentController::class, 'cashOnDelivery'])->name('cash-on-delivery');
+            Route::post('/stripe-payment-intent', [PaymentController::class, 'createStripePaymentIntent'])->name('stripe-payment-intent');
             Route::post('/pay-with-stripe', [PaymentController::class, 'payWithStripe'])->name('pay-with-stripe');
 
 
@@ -318,6 +326,11 @@ Route::group(['middleware' => ['maintainance']], function () {
         Route::get('load-new-message/{id}', [SellerMessageContoller::class, 'loadNewMessage'])->name('load-new-message');
         Route::get('send-message', [SellerMessageContoller::class, 'sendMessage'])->name('send-message');
 
+        Route::get('leads', [SellerLeadController::class, 'index']);
+        Route::get('lead/{id}', [SellerLeadController::class, 'show']);
+        Route::put('lead-status/{id}', [SellerLeadController::class, 'updateStatus']);
+        Route::delete('lead/{id}', [SellerLeadController::class, 'destroy']);
+
     });
 
 
@@ -328,7 +341,7 @@ Route::group(['as'=> 'api.admin.', 'prefix' => 'admin'],function (){
 
     // start auth route
     Route::get('login', [AdminLoginController::class,'adminLoginPage'])->name('login');
-    Route::post('login', [AdminLoginController::class,'storeLogin'])->name('login');
+    Route::post('login', [AdminLoginController::class,'storeLogin'])->name('login.store');
     Route::post('logout', [AdminLoginController::class,'adminLogout'])->name('logout');
     Route::get('forget-password', [AdminForgotPasswordController::class,'forgetPassword'])->name('forget-password');
     Route::post('send-forget-password', [AdminForgotPasswordController::class,'sendForgetEmail'])->name('send.forget.password');
@@ -689,6 +702,10 @@ Route::group(['as'=> 'api.admin.', 'prefix' => 'admin'],function (){
     Route::get('website-validation-language', [LanguageController::class, 'websiteValidationLanguage'])->name('website-validation-language');
     Route::post('update-validation-language', [LanguageController::class, 'updateValidationLanguage'])->name('update-validation-language');
 
+    Route::get('leads', [AdminLeadController::class, 'index']);
+    Route::get('lead/{id}', [AdminLeadController::class, 'show']);
+    Route::put('lead-status/{id}', [AdminLeadController::class, 'updateStatus']);
+    Route::delete('lead/{id}', [AdminLeadController::class, 'destroy']);
 
 });
 

@@ -19,6 +19,7 @@
 *.sqlite-wal
 *.sqlite-shm
 .env
+.env.production
 .env.backup
 .env.*.backup
 .phpunit.result.cache

@@ -205,7 +205,7 @@ class HomeController extends Controller
 
     public function productByCategory($id){
         $category = Category::find($id);
-        $products = Product::with('activeVariants.activeVariantItems')->where(['category_id' => $id, 'status' => 1,'approve_by_admin' => 1])->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id')->orderBy('id','desc')->get();
+        $products = Product::with('activeVariants.activeVariantItems')->where(['category_id' => $id, 'status' => 1,'approve_by_admin' => 1])->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id', 'product_type', 'reference_price')->orderBy('id','desc')->get();
 
         return response()->json(['category' => $category, 'products' => $products]);
     }
@@ -231,7 +231,7 @@ class HomeController extends Controller
         }
 
         $setting = Setting::first();
-        $popularCategoryProducts = Product::with('activeVariants.activeVariantItems')->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id')->whereIn('category_id', $category_arr)->where('status',1)->where('approve_by_admin', 1)->orderBy('id','desc')->get()->take($popularCategoryVisibilty->qty);
+        $popularCategoryProducts = Product::with('activeVariants.activeVariantItems')->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id', 'product_type', 'reference_price')->whereIn('category_id', $category_arr)->where('status',1)->where('approve_by_admin', 1)->orderBy('id','desc')->get()->take($popularCategoryVisibilty->qty);
 
         $popularCategoryVisibilty = $popularCategoryVisibilty->status == 1 ? true : false;
         $popularCategorySidebarBanner = $setting->popular_category_banner;
@@ -241,7 +241,7 @@ class HomeController extends Controller
         $flashSale = FlashSale::first();
         $flashSaleSidebarBanner = BannerImage::select('id','link as play_store','image','banner_location','status','title as app_store')->find(24);
         $topRatedVisibility = HomePageOneVisibility::find(6);
-        $topRatedProducts = Product::with('activeVariants.activeVariantItems')->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id')->where(['is_top' => 1, 'status' => 1,'approve_by_admin' => 1])->orderBy('id','desc')->get()->take($topRatedVisibility->qty);
+        $topRatedProducts = Product::with('activeVariants.activeVariantItems')->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id', 'product_type', 'reference_price')->where(['is_top' => 1, 'status' => 1,'approve_by_admin' => 1])->orderBy('id','desc')->get()->take($topRatedVisibility->qty);
         $topRatedVisibility = $topRatedVisibility->status == 1 ? true : false;
         $sellerVisibility = HomePageOneVisibility::find(7);
         $sellers = Vendor::where(['status' => 1])->select('id','logo','banner_image','shop_name','slug')->get()->take($sellerVisibility->qty);
@@ -256,19 +256,19 @@ class HomeController extends Controller
             $category_arr[] = $featuredCategory->category_id;
         }
 
-        $featuredCategoryProducts = Product::with('activeVariants.activeVariantItems')->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id')->whereIn('category_id', $category_arr)->where(['status' => 1,'approve_by_admin' => 1])->orderBy('id','desc')->get()->take($featuredProductVisibility->qty);
+        $featuredCategoryProducts = Product::with('activeVariants.activeVariantItems')->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id', 'product_type', 'reference_price')->whereIn('category_id', $category_arr)->where(['status' => 1,'approve_by_admin' => 1])->orderBy('id','desc')->get()->take($featuredProductVisibility->qty);
         $featuredProductVisibility = $featuredProductVisibility->status == 1 ? true : false;
         $singleBannerOne = BannerImage::select('id','link','image','banner_location','status','title_one','title_two','product_slug')->find(21);
 
         $newArrivalProductVisibility = HomePageOneVisibility::find(9);
-        $newArrivalProducts = Product::with('activeVariants.activeVariantItems')->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id')->where(['new_product' => 1, 'status' => 1, 'approve_by_admin' => 1])->orderBy('id','desc')->get()->take($newArrivalProductVisibility->qty);
+        $newArrivalProducts = Product::with('activeVariants.activeVariantItems')->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id', 'product_type', 'reference_price')->where(['new_product' => 1, 'status' => 1, 'approve_by_admin' => 1])->orderBy('id','desc')->get()->take($newArrivalProductVisibility->qty);
         $newArrivalProductVisibility = $newArrivalProductVisibility->status == 1 ? true : false;
 
         $singleBannerTwo = BannerImage::select('id','link','image','banner_location','status','title_one','product_slug')->find(22);
 
         $bestProductVisibility = HomePageOneVisibility::find(10);
 
-        $bestProducts = Product::with('activeVariants.activeVariantItems')->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id')->where(['is_best' => 1, 'status' => 1, 'approve_by_admin' => 1])->orderBy('id','desc')->get()->take($bestProductVisibility->qty);
+        $bestProducts = Product::with('activeVariants.activeVariantItems')->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id', 'product_type', 'reference_price')->where(['is_best' => 1, 'status' => 1, 'approve_by_admin' => 1])->orderBy('id','desc')->get()->take($bestProductVisibility->qty);
 
         $bestProductVisibility = $bestProductVisibility->status == 1 ? true : false;
 
@@ -538,7 +538,7 @@ class HomeController extends Controller
         }
 
         $paginateQty = CustomPagination::whereId('2')->first()->qty;
-        $products = $products->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id');
+        $products = $products->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id', 'product_type', 'reference_price');
         $products = $products->paginate($paginateQty);
         $products = $products->appends($request->all());
         $sellerReviewQty = ProductReview::where('status',1)->where('product_vendor_id',$seller->id)->count();
@@ -634,7 +634,7 @@ class HomeController extends Controller
             $products = $products->where('name','LIKE','%'.$request->search.'%');
         }
 
-        $products = $products->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id');
+        $products = $products->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id', 'product_type', 'reference_price');
         $products = $products->paginate($paginateQty);
         $products = $products->appends($request->all());
         $seoSetting = SeoSetting::find(9);
@@ -775,7 +775,7 @@ class HomeController extends Controller
                                 ->orWhere('long_description','LIKE','%'.$request->search.'%');
         }
 
-        $products = $products->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id');
+        $products = $products->select('id','name', 'short_name', 'slug', 'thumb_image','qty','sold_qty', 'price', 'offer_price','is_undefine','is_featured','new_product', 'is_top', 'is_best','category_id','sub_category_id','child_category_id','brand_id', 'product_type', 'reference_price');
         $products = $products->paginate($paginateQty);
         $products = $products->appends($request->all());
 

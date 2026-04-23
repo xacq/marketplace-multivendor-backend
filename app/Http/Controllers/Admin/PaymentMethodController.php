@@ -13,6 +13,7 @@ use App\Models\PaystackAndMollie;
 use App\Models\InstamojoPayment;
 use App\Models\CurrencyCountry;
 use App\Models\Currency;
+use App\Models\DeunaPayment;
 use App\Models\Setting;
 use Image;
 use File;
@@ -31,12 +32,13 @@ class PaymentMethodController extends Controller
         $bank = BankPayment::first();
         $paystackAndMollie = PaystackAndMollie::first();
         $instamojo = InstamojoPayment::first();
+        $deuna = DeunaPayment::first();
 
         $countires = CurrencyCountry::orderBy('name','asc')->get();
         $currencies = Currency::orderBy('name','asc')->get();
         $setting = Setting::first();
 
-        return response()->json(['paypal' => $paypal, 'stripe' => $stripe, 'razorpay' => $razorpay, 'flutterwave' => $flutterwave, 'bank' => $bank, 'paystackAndMollie' => $paystackAndMollie, 'instamojo' => $instamojo, 'countires' => $countires, 'currencies' => $currencies, 'setting' => $setting], 200);
+        return response()->json(['paypal' => $paypal, 'stripe' => $stripe, 'razorpay' => $razorpay, 'flutterwave' => $flutterwave, 'bank' => $bank, 'paystackAndMollie' => $paystackAndMollie, 'instamojo' => $instamojo, 'deuna' => $deuna, 'countires' => $countires, 'currencies' => $currencies, 'setting' => $setting], 200);
 
     }
 
@@ -322,6 +324,49 @@ class PaymentMethodController extends Controller
         return response()->json($message);
     }
 
+    public function updateDeuna(Request $request){
+        $rules = [
+            'deuna_key' => 'required',
+            'deuna_secret' => 'required',
+            'country_name' => 'required',
+            'currency_name' => 'required',
+            'currency_rate' => 'required',
+        ];
+        $customMessages = [
+            'deuna_key.required' => trans('Deuna key is required'),
+            'deuna_secret.required' => trans('Deuna secret is required'),
+            'country_name.required' => trans('Country name is required'),
+            'currency_name.required' => trans('Currency name is required'),
+            'currency_rate.required' => trans('Currency rate is required'),
+        ];
+        $this->validate($request, $rules,$customMessages);
 
+        $deuna = DeunaPayment::first();
+        if(!$deuna) {
+            $deuna = new DeunaPayment();
+        }
+        $deuna->deuna_key = $request->deuna_key;
+        $deuna->deuna_secret = $request->deuna_secret;
+        $deuna->country_code = $request->country_name;
+        $deuna->currency_code = $request->currency_name;
+        $deuna->currency_rate = $request->currency_rate;
+        $deuna->status = $request->status ? 1 : 0;
+        $deuna->save();
+
+        if($request->image){
+            $old_image=$deuna->image;
+            $image=$request->image;
+            $extention=$image->getClientOriginalExtension();
+            $image_name= 'deuna-'.date('Y-m-d-h-i-s-').rand(999,9999).'.'.$extention;
+            $image_name='uploads/website-images/'.$image_name;
+            Image::make($image)->save(public_path().'/'.$image_name);
+            $deuna->image=$image_name;
+            $deuna->save();
+            if($old_image && File::exists(public_path().'/'.$old_image))unlink(public_path().'/'.$old_image);
+        }
+
+        $notification=trans('Updated Successfully');
+        return response()->json(['notification' => $notification], 200);
+    }
 
 }

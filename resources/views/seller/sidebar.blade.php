@@ -61,6 +61,9 @@
 
           <li class="{{ Route::is('seller.my-withdraw.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('seller.my-withdraw.index') }}"><i class="far fa-newspaper"></i> <span>{{__('admin.My Withdraw')}}</span></a></li>
 
+          <!-- Leads Option -->
+          <li class="{{ Route::is('seller.leads.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('seller.leads.index') }}"><i class="fas fa-users"></i> <span>Interesados (Leads)</span></a></li>
+
           @php
               $dashobard_url = $setting->frontend_url.'profile#dashboard';
           @endphp

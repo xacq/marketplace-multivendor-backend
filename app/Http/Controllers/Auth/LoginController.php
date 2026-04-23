@@ -14,6 +14,8 @@ use App\Models\Vendor;
 use App\Rules\Captcha;
 use Auth;
 use Hash;
+use App\Models\Setting;
+use Laravel\Socialite\Facades\Socialite;
 use App\Mail\UserForgetPassword;
 use App\Helpers\MailHelper;
 use App\Models\EmailTemplate;
@@ -21,7 +23,6 @@ use App\Models\SocialLoginInformation;
 use Mail;
 use Str;
 use Validator,Redirect,Response,File;
-use Socialite;
 use Carbon\Carbon;
 class LoginController extends Controller
 {
@@ -107,6 +108,32 @@ class LoginController extends Controller
         ]);
     }
 
+
+    public function guestLogin() {
+        $uuid = (string) Str::uuid();
+        $email = 'guest_' . $uuid . '@somie.com';
+        $password = Str::random(16);
+
+        $user = User::create([
+            'name' => 'Invitado',
+            'email' => $email,
+            'password' => Hash::make($password),
+            'status' => 1,
+            'email_verified' => 1,
+            'is_guest' => 1,
+        ]);
+
+        $credential = [
+            'email' => $email,
+            'password' => $password
+        ];
+
+        if (! $token = Auth::guard('api')->attempt($credential, ['exp' => Carbon::now()->addDays(365)->timestamp])) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token, 0, $user);
+    }
 
     public function forgetPage(){
         $banner = BreadcrumbImage::where(['id' => 5])->first();

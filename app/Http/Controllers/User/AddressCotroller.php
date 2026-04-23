@@ -54,6 +54,7 @@ class AddressCotroller extends Controller
         $this->validate($request, $rules,$customMessages);
 
         $user = Auth::guard('api')->user();
+
         $isExist = Address::where(['user_id' => $user->id])->count();
         $address = new Address();
         $address->user_id = $user->id;
@@ -63,7 +64,6 @@ class AddressCotroller extends Controller
         $address->address = $request->address;
         $address->country_id = $request->country;
         $address->state_id = $request->state;
-        $address->city_id = $request->city;
         $address->city_id = $request->city;
         $address->type = $request->type;
         if($isExist == 0){
@@ -148,7 +148,6 @@ class AddressCotroller extends Controller
         $address->address = $request->address;
         $address->country_id = $request->country;
         $address->state_id = $request->state;
-        $address->city_id = $request->city;
         $address->city_id = $request->city;
         $address->type = $request->type;
         $address->save();

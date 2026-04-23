@@ -38,7 +38,13 @@
                                     <tr>
                                         <td>{{ ++$index }}</td>
                                         <td><a target="_blank" href="{{ $frontend_view.$product->slug }}">{{ $product->short_name }}</a></td>
-                                        <td>{{ $setting->currency_icon }}{{ $product->price }}</td>
+                                        <td>
+                                            @if ($product->product_type == 'contact')
+                                                {{ $setting->currency_icon }}{{ $product->reference_price }}
+                                            @else
+                                                {{ $setting->currency_icon }}{{ $product->price }}
+                                            @endif
+                                        </td>
                                         <td> <img class="rounded-circle" src="{{ asset($product->thumb_image) }}" alt="" width="100px" height="100px"></td>
                                         <td>
                                             @if ($product->new_product == 1)

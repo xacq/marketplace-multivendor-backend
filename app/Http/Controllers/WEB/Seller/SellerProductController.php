@@ -117,10 +117,17 @@ class SellerProductController extends Controller
             'category' => 'required',
             'short_description' => 'required',
             'long_description' => 'required',
-            'price' => 'required|numeric',
-            'weight' => 'required',
-            'quantity' => 'required|numeric',
         ];
+
+        if ($request->product_type === 'contact') {
+            $rules['price'] = 'nullable|numeric';
+            $rules['weight'] = 'nullable';
+            $rules['quantity'] = 'nullable|numeric';
+        } else {
+            $rules['price'] = 'required|numeric';
+            $rules['weight'] = 'required';
+            $rules['quantity'] = 'required|numeric';
+        }
         $customMessages = [
             'short_name.required' => trans('admin_validation.Short name is required'),
             'short_name.unique' => trans('admin_validation.Short name is required'),
@@ -160,8 +167,10 @@ class SellerProductController extends Controller
         $product->child_category_id = $request->child_category ? $request->child_category : 0;
         $product->brand_id = $request->brand ? $request->brand : 0;
         $product->sku = $request->sku;
-        $product->price = $request->price;
+        $product->price = $request->price ? $request->price : 0;
         $product->offer_price = $request->offer_price;
+        $product->reference_price = $request->reference_price;
+        $product->product_type = $request->product_type ? $request->product_type : 'shop';
         $product->qty = $request->quantity ? $request->quantity : 0;
         $product->short_description = $request->short_description;
         $product->long_description = $request->long_description;
@@ -177,6 +186,7 @@ class SellerProductController extends Controller
         $product->is_best = $request->best_product ? 1 : 0;
         $product->is_featured = $request->is_featured ? 1 : 0;
         $product->save();
+        \Log::info('Seller WEB Product CREATED:', ['id' => $product->id, 'type' => $product->product_type, 'req' => $request->all()]);
 
         if($request->is_specification){
             $exist_specifications=[];
@@ -245,9 +255,17 @@ class SellerProductController extends Controller
             'category' => 'required',
             'short_description' => 'required',
             'long_description' => 'required',
-            'price' => 'required|numeric',
-            'weight' => 'required',
         ];
+
+        if ($request->product_type === 'contact') {
+            $rules['price'] = 'nullable|numeric';
+            $rules['weight'] = 'nullable';
+            $rules['quantity'] = 'nullable|numeric';
+        } else {
+            $rules['price'] = 'required|numeric';
+            $rules['weight'] = 'required';
+            $rules['quantity'] = 'required|numeric';
+        }
         $customMessages = [
             'short_name.required' => trans('admin_validation.Short name is required'),
             'short_name.unique' => trans('admin_validation.Short name is required'),
@@ -291,8 +309,11 @@ class SellerProductController extends Controller
         $product->child_category_id = $request->child_category ? $request->child_category : 0;
         $product->brand_id = $request->brand ? $request->brand : 0;
         $product->sku = $request->sku;
-        $product->price = $request->price;
+        $product->price = $request->price ? $request->price : 0;
         $product->offer_price = $request->offer_price;
+        $product->reference_price = $request->reference_price;
+        $product->product_type = $request->product_type ? $request->product_type : 'shop';
+        $product->qty = $request->quantity ? $request->quantity : 0;
         $product->short_description = $request->short_description;
         $product->long_description = $request->long_description;
         $product->tags = $request->tags;
@@ -309,6 +330,7 @@ class SellerProductController extends Controller
             $product->status = $request->status;
         }
         $product->save();
+        \Log::info('Seller WEB Product UPDATED:', ['id' => $product->id, 'type' => $product->product_type, 'req' => $request->all()]);
 
         $exist_specifications=[];
         if($request->keys){

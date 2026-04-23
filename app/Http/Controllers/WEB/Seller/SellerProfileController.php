@@ -20,6 +20,11 @@ use Image;
 use File;
 use Str;
 use Hash;
+use Stripe\Stripe;
+use Stripe\Account;
+use Stripe\AccountLink;
+use App\Models\StripePayment;
+
 class SellerProfileController extends Controller
 {
     public function __construct()
@@ -101,7 +106,7 @@ class SellerProfileController extends Controller
             $image_name= Str::slug($request->name).date('-Y-m-d-h-i-s-').rand(999,9999).'.'.$extention;
             $image_name='uploads/custom-images/'.$image_name;
 
-            Image::make($user_image)
+            \Image::make($user_image)
                 ->save(public_path().'/'.$image_name);
 
             $user->image=$image_name;
@@ -176,6 +181,21 @@ class SellerProfileController extends Controller
         $seller->greeting_msg = $request->greeting_msg;
         $seller->seo_title = $request->seo_title ? $request->seo_title : $request->shop_name;
         $seller->seo_description = $request->seo_description ? $request->seo_description : $request->shop_name;
+
+        // Payment Information
+        if ($request->has('bank_account_info')) {
+            $seller->bank_account_info = $request->bank_account_info;
+        }
+        if ($request->has('deuna_link')) {
+            $seller->deuna_link = $request->deuna_link;
+        }
+        if ($request->has('deuna_api_key')) {
+            $seller->deuna_api_key = $request->deuna_api_key;
+        }
+        if ($request->has('deuna_api_secret')) {
+            $seller->deuna_api_secret = $request->deuna_api_secret;
+        }
+
         $seller->save();
 
         if($request->logo){
@@ -241,5 +261,66 @@ class SellerProfileController extends Controller
 
         return response()->json(['emails' => $emails, 'user' => $user]);
 
+    }
+
+    public function redirectToStripe()
+    {
+        $user = Auth::guard('web')->user();
+        $seller = Vendor::where('user_id', $user->id)->first();
+        $stripeConfig = StripePayment::first();
+
+        if (!$stripeConfig || !$stripeConfig->stripe_secret) {
+            $notification = trans('admin_validation.Stripe payment is not configured by admin');
+            $notification = array('messege' => $notification, 'alert-type' => 'error');
+            return redirect()->back()->with($notification);
+        }
+
+        Stripe::setApiKey($stripeConfig->stripe_secret);
+
+        if (!$seller->stripe_account_id) {
+            // Create a new Stripe Connect account for the seller (Standard)
+            $account = Account::create([
+                'type' => 'standard',
+                'email' => $user->email,
+            ]);
+            $seller->stripe_account_id = $account->id;
+            $seller->save();
+        }
+
+        // Create the onboarding link
+        $accountLink = AccountLink::create([
+            'account' => $seller->stripe_account_id,
+            'refresh_url' => route('seller.stripe-onboard'),
+            'return_url' => route('seller.stripe-callback'),
+            'type' => 'account_onboarding',
+        ]);
+
+        return redirect()->away($accountLink->url);
+    }
+
+    public function handleStripeCallback()
+    {
+        $user = Auth::guard('web')->user();
+        $seller = Vendor::where('user_id', $user->id)->first();
+        $stripeConfig = StripePayment::first();
+
+        Stripe::setApiKey($stripeConfig->stripe_secret);
+
+        try {
+            $account = Account::retrieve($seller->stripe_account_id);
+            
+            if ($account->details_submitted) {
+                $notification = trans('admin_validation.Stripe account connected successfully');
+                $notification = array('messege' => $notification, 'alert-type' => 'success');
+            } else {
+                $notification = trans('admin_validation.Stripe onboarding not completed yet');
+                $notification = array('messege' => $notification, 'alert-type' => 'error');
+            }
+        } catch (\Exception $e) {
+            $notification = $e->getMessage();
+            $notification = array('messege' => $notification, 'alert-type' => 'error');
+        }
+
+        return redirect()->route('seller.shop-profile')->with($notification);
     }
 }

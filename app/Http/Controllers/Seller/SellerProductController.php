@@ -86,11 +86,17 @@ class SellerProductController extends Controller
             'category' => 'required',
             'short_description' => 'required',
             'long_description' => 'required',
-            'price' => 'required|numeric',
             'status' => 'required',
-            'weight' => 'required',
-            'quantity' => 'required|numeric',
         ];
+        if ($request->product_type === 'contact') {
+            $rules['price'] = 'nullable|numeric';
+            $rules['weight'] = 'nullable';
+            $rules['quantity'] = 'nullable|numeric';
+        } else {
+            $rules['price'] = 'required|numeric';
+            $rules['weight'] = 'required';
+            $rules['quantity'] = 'required|numeric';
+        }
         $customMessages = [
             'short_name.required' => trans('Short name is required'),
             'short_name.unique' => trans('Short name is required'),
@@ -130,8 +136,10 @@ class SellerProductController extends Controller
         $product->child_category_id = $request->child_category ? $request->child_category : 0;
         $product->brand_id = $request->brand ? $request->brand : 0;
         $product->sku = $request->sku;
-        $product->price = $request->price;
+        $product->price = $request->price ? $request->price : 0;
         $product->offer_price = $request->offer_price;
+        $product->reference_price = $request->reference_price;
+        $product->product_type = $request->product_type ? $request->product_type : 'shop';
         $product->qty = $request->quantity ? $request->quantity : 0;
         $product->short_description = $request->short_description;
         $product->long_description = $request->long_description;
@@ -220,11 +228,18 @@ class SellerProductController extends Controller
             'category' => 'required',
             'short_description' => 'required',
             'long_description' => 'required',
-            'price' => 'required|numeric',
             'status' => 'required',
-            'weight' => 'required',
-            'quantity' => 'required|numeric',
         ];
+
+        if ($request->product_type === 'contact') {
+            $rules['price'] = 'nullable|numeric';
+            $rules['weight'] = 'nullable';
+            $rules['quantity'] = 'nullable|numeric';
+        } else {
+            $rules['price'] = 'required|numeric';
+            $rules['weight'] = 'required';
+            $rules['quantity'] = 'required|numeric';
+        }
         $customMessages = [
             'short_name.required' => trans('Short name is required'),
             'short_name.unique' => trans('Short name is required'),
@@ -270,8 +285,10 @@ class SellerProductController extends Controller
         $product->qty = $request->quantity ? $request->quantity : 0;
         $product->sold_qty = 0;
         $product->sku = $request->sku;
-        $product->price = $request->price;
+        $product->price = $request->price ? $request->price : 0;
         $product->offer_price = $request->offer_price;
+        $product->reference_price = $request->reference_price;
+        $product->product_type = $request->product_type ? $request->product_type : 'shop';
         $product->short_description = $request->short_description;
         $product->long_description = $request->long_description;
         $product->tags = $request->tags;

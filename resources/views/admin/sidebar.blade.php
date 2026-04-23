@@ -163,6 +163,10 @@
 
 
 
+              <!-- Leads Option -->
+
+              <li class="{{ Route::is('admin.leads.*') ? 'active' : '' }}"><a class="nav-link" href="{{ route('admin.leads.index') }}">Interesados (Leads)</a></li>
+
 
 
             </ul>

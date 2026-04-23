@@ -59,6 +59,10 @@
                                         </li>
 
                                         <li class="nav-item border rounded mb-1">
+                                            <a class="nav-link" id="deuna-tab" data-toggle="tab" href="#deunaTab" role="tab" aria-controls="deunaTab" aria-selected="true">{{__('admin.Deuna')}}</a>
+                                        </li>
+
+                                        <li class="nav-item border rounded mb-1">
                                             <a class="nav-link" id="bank-account-tab" data-toggle="tab" href="#bankAccountTab" role="tab" aria-controls="bankAccountTab" aria-selected="true">{{__('admin.Bank Account')}}</a>
                                         </li>
                                         @if ($bank)
@@ -606,6 +610,28 @@
                                                                 <input type="text" class="form-control" name="currency_rate" value="{{ $sslcommerz->currency_rate }}">
                                                             </div>
 
+                                                            <button class="btn btn-primary">{{__('admin.Update')}}</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="tab-pane fade" id="deunaTab" role="tabpanel" aria-labelledby="deuna-tab">
+                                                <div class="card m-0">
+                                                    <div class="card-body">
+                                                        <form action="{{ route('admin.update-deuna') }}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="form-group">
+                                                                <label for="">{{__('admin.Deuna Status')}}</label>
+                                                                <div>
+                                                                    @if ($deuna->status == 1)
+                                                                        <input id="status_toggle" type="checkbox" checked data-toggle="toggle" data-on="{{__('admin.Enable')}}" data-off="{{__('admin.Disable')}}" data-onstyle="success" data-offstyle="danger" name="status">
+                                                                        @else
+                                                                        <input id="status_toggle" type="checkbox" data-toggle="toggle" data-on="{{__('admin.Enable')}}" data-off="{{__('admin.Disable')}}" data-onstyle="success" data-offstyle="danger" name="status">
+                                                                    @endif
+                                                                </div>
+                                                            </div>
                                                             <button class="btn btn-primary">{{__('admin.Update')}}</button>
                                                         </form>
                                                     </div>

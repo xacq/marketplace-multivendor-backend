@@ -37,7 +37,13 @@
                                     <tr>
                                         <td>{{ ++$index }}</td>
                                         <td><a href="javscript:;">{{ $product->short_name }}</a></td>
-                                        <td>{{ $setting->currency_icon }}{{ $product->price }}</td>
+                                        <td>
+                                            @if ($product->product_type == 'contact')
+                                                {{ $setting->currency_icon }}{{ $product->reference_price }}
+                                            @else
+                                                {{ $setting->currency_icon }}{{ $product->price }}
+                                            @endif
+                                        </td>
                                         <td> <img class="rounded-circle" src="{{ asset($product->thumb_image) }}" alt="" width="100px" height="100px"></td>
                                         <td>
                                             @if($product->approve_by_admin == 1)

@@ -15,6 +15,28 @@
           </div>
 
           <div class="section-body">
+            @if(isset($stripeBalance) && count($stripeBalance) > 0)
+            <div class="row">
+                @foreach($stripeBalance as $balance)
+                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                  <div class="card card-statistic-1">
+                    <div class="card-icon bg-primary">
+                      <i class="fab fa-stripe-s text-white"></i>
+                    </div>
+                    <div class="card-wrap">
+                      <div class="card-header">
+                        <h4>{{ __('admin.Stripe Balance') }} ({{ strtoupper($balance->currency) }})</h4>
+                      </div>
+                      <div class="card-body">
+                        {{ number_format($balance->amount / 100, 2) }} {{ strtoupper($balance->currency) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endforeach
+            </div>
+            @endif
+
             <a href="{{ route('seller.my-withdraw.create') }}" class="btn btn-primary"><i class="fas fa-plus"></i> {{__('admin.New withdraw')}}</a>
             <div class="row mt-4">
                 <div class="col">
