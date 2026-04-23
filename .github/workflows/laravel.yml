@@ -21,7 +21,6 @@ jobs:
           username: ${{ secrets.SSH_USER_FULFILLEC }}
           password: ${{ secrets.SSH_PASSWORD_FULFILLEC }}
           port: 22
+          script_stop: true
           script: |
-            cd /www/wwwroot/storead.fulfillec.com
-            git pull origin main-fulfillec
-            bash deploy.sh
+            bash /www/wwwroot/storead.fulfillec.com/deploy.sh
