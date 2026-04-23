@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 
+PHP="php -d disable_functions=''"
+
 echo "Starting Deployment for Backend..."
 
-# Navegar al directorio del proyecto
 cd /www/wwwroot/storead.fulfillec.com
 
 # Setup .env si no existe
@@ -13,18 +14,24 @@ if [ ! -f .env ]; then
 fi
 
 # Instalar dependencias
-php -d disable_functions="" /usr/local/bin/composer install --no-dev --optimize-autoloader
+$PHP /usr/local/bin/composer install --no-dev --optimize-autoloader
 
 # Ejecutar migraciones
-php artisan migrate --force
+$PHP artisan migrate --force
 
 # Storage link
 if [ ! -L public/storage ]; then
     ln -sf "$(pwd)/storage/app/public" public/storage
 fi
 
-# Limpiar y reconstruir caché
-php artisan config:cache
-php artisan view:cache
+# Limpiar cachés viejos primero
+$PHP artisan cache:clear
+$PHP artisan config:clear
+$PHP artisan view:clear
+$PHP artisan route:clear
+
+# Reconstruir cachés
+$PHP artisan config:cache
+$PHP artisan view:cache
 
 echo "Deployment finished successfully!"
