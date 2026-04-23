@@ -1,11 +1,13 @@
 #!/bin/bash
 set -e
 
-PHP="php -d disable_functions=''"
-
 echo "Starting Deployment for Backend..."
 
 cd /www/wwwroot/storead.fulfillec.com
+
+# Sincronizar con el repo remoto (siempre usa el estado de GitHub, descarta commits locales)
+git fetch origin main-fulfillec
+git reset --hard origin/main-fulfillec
 
 # Setup .env si no existe
 if [ ! -f .env ]; then
@@ -14,24 +16,24 @@ if [ ! -f .env ]; then
 fi
 
 # Instalar dependencias
-$PHP /usr/local/bin/composer install --no-dev --optimize-autoloader
+php -d disable_functions="" /usr/local/bin/composer install --no-dev --optimize-autoloader
 
 # Ejecutar migraciones
-$PHP artisan migrate --force
+php -d disable_functions="" artisan migrate --force
 
 # Storage link
 if [ ! -L public/storage ]; then
     ln -sf "$(pwd)/storage/app/public" public/storage
 fi
 
-# Limpiar cachés viejos primero
-$PHP artisan cache:clear
-$PHP artisan config:clear
-$PHP artisan view:clear
-$PHP artisan route:clear
+# Limpiar cachés viejos
+php -d disable_functions="" artisan cache:clear
+php -d disable_functions="" artisan config:clear
+php -d disable_functions="" artisan view:clear
+php -d disable_functions="" artisan route:clear
 
 # Reconstruir cachés
-$PHP artisan config:cache
-$PHP artisan view:cache
+php -d disable_functions="" artisan config:cache
+php -d disable_functions="" artisan view:cache
 
 echo "Deployment finished successfully!"
