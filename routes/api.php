@@ -341,7 +341,7 @@ Route::group(['as'=> 'api.admin.', 'prefix' => 'admin'],function (){
 
     // start auth route
     Route::get('login', [AdminLoginController::class,'adminLoginPage'])->name('login');
-    Route::post('login', [AdminLoginController::class,'storeLogin'])->name('login');
+    Route::post('login', [AdminLoginController::class,'storeLogin'])->name('login.store');
     Route::post('logout', [AdminLoginController::class,'adminLogout'])->name('logout');
     Route::get('forget-password', [AdminForgotPasswordController::class,'forgetPassword'])->name('forget-password');
     Route::post('send-forget-password', [AdminForgotPasswordController::class,'sendForgetEmail'])->name('send.forget.password');
