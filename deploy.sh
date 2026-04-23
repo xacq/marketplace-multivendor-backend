@@ -16,7 +16,7 @@ chown -R www:www storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
 # Instalar dependencias
-composer install --no-dev --optimize-autoloader
+php -d disable_functions="" /usr/local/bin/composer install --no-dev --optimize-autoloader
 
 # Ejecutar migraciones
 php artisan migrate --force
