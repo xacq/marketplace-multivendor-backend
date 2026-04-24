@@ -8,14 +8,15 @@ cd /www/wwwroot/storead.fulfillec.com
 # Sincronizar con el repo remoto
 git pull origin main-fulfillec --ff-only
 
-# Setup .env si no existe
-if [ ! -f .env ]; then
-    cp .env.production .env
-    echo ".env created from .env.production"
-fi
+# Aplicar configuración de producción
+cp .env.production .env
+
+# Permisos de storage
+chown -R www:www storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
 
 # Instalar dependencias
-php /usr/local/bin/composer install --no-dev --optimize-autoloader
+php -d disable_functions="" /usr/local/bin/composer install --no-dev --optimize-autoloader
 
 # Ejecutar migraciones
 php artisan migrate --force

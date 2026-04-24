@@ -11,7 +11,7 @@ jobs:
     environment: production
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Codee
         uses: actions/checkout@v4
 
       - name: Deploy via SSH
