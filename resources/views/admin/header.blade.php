@@ -15,16 +15,16 @@
   <link rel="stylesheet" href="{{ asset('backend/css/bootstrap.min.css') }}">
   <link href="{{ asset('backend/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('backend/fontawesome/css/all.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('backend/css/style.css') }}">
+  <link rel="stylesheet" href="{{ asset('backend/css/style.css') }}?v={{ config('app.version', '1') }}">
   <link rel="stylesheet" href="{{ asset('backend/css/bootstrap-social.css') }}">
-  <link rel="stylesheet" href="{{ asset('backend/css/components.css') }}">
+  <link rel="stylesheet" href="{{ asset('backend/css/components.css') }}?v={{ config('app.version', '1') }}">
   @if ($setting->text_direction == 'rtl')
     <link rel="stylesheet" href="{{ asset('backend/css/rtl.css') }}">
     <link rel="stylesheet" href="{{ asset('backend/css/dev_rtl.css') }}">
     @endif
   <link rel="stylesheet" href="{{ asset('toastr/toastr.min.css') }}">
   <link rel="stylesheet" href="{{ asset('backend/css/bootstrap4-toggle.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('backend/css/dev.css') }}">
+  <link rel="stylesheet" href="{{ asset('backend/css/dev.css') }}?v={{ config('app.version', '1') }}">
   <link rel="stylesheet" href="{{ asset('backend/css/select2.min.css') }}">
   <link rel="stylesheet" href="{{ asset('backend/css/tagify.css') }}">
   <link rel="stylesheet" href="{{ asset('backend/css/bootstrap-tagsinput.css') }}">
