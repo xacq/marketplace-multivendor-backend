@@ -11,9 +11,9 @@ git pull origin main-fulfillec --ff-only
 # Aplicar configuración de producción
 cp .env.production .env
 
-# Permisos de storage
-chown -R www:www storage bootstrap/cache
-chmod -R 775 storage bootstrap/cache
+# Permisos de storage y uploads
+chown -R www:www storage bootstrap/cache public/uploads
+chmod -R 775 storage bootstrap/cache public/uploads
 
 # Instalar dependencias
 php -d disable_functions="" /usr/local/bin/composer install --no-dev --optimize-autoloader
