@@ -825,6 +825,10 @@ Route::group(['as'=> 'admin.', 'prefix' => 'admin'],function (){
 
     Route::get('seller-list',[SellerController::class,'index'])->name('seller-list');
 
+    Route::get('seller-create',[SellerController::class,'create'])->name('seller-create');
+
+    Route::post('seller-store',[SellerController::class,'store'])->name('seller-store');
+
     Route::get('seller-show/{id}',[SellerController::class,'show'])->name('seller-show');
 
     Route::put('seller-status/{id}',[SellerController::class,'changeStatus'])->name('seller-status');

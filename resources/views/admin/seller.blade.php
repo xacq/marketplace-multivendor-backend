@@ -15,7 +15,10 @@
           </div>
 
           <div class="section-body">
-              <a href="{{ route('admin.send-email-to-all-seller') }}" class="btn btn-primary">{{__('admin.Send email to all seller')}}</a>
+              <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                <a href="{{ route('admin.send-email-to-all-seller') }}" class="btn btn-primary">{{__('admin.Send email to all seller')}}</a>
+                <a href="{{ route('admin.seller-create') }}" class="btn btn-success"><i class="fas fa-plus"></i> {{__('admin.Add New')}}</a>
+              </div>
             <div class="row mt-4">
                 <div class="col">
                   <div class="card">

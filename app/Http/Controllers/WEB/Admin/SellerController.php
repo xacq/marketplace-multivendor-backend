@@ -23,9 +23,11 @@ use App\Models\BannerImage;
 use App\Models\Setting;
 use App\Models\EmailTemplate;
 use Auth;
+use Hash;
 use Image;
 use File;
 use Mail;
+use Str;
 class SellerController extends Controller
 {
     public function __construct()
@@ -41,6 +43,84 @@ class SellerController extends Controller
 
         return view('admin.seller', compact('sellers','defaultProfile','products','setting'));
 
+    }
+
+    public function create(){
+        $defaultAvatar = Setting::select('become_seller_avatar')->first();
+        return view('admin.create_seller', compact('defaultAvatar'));
+    }
+
+    public function store(Request $request){
+        $rules = [
+            'name'      => 'required',
+            'email'     => 'required|email|unique:users',
+            'password'  => 'required|min:4',
+            'shop_name' => 'required|unique:vendors',
+            'phone'     => 'required',
+        ];
+        $customMessages = [
+            'name.required'       => trans('admin_validation.Name is required'),
+            'email.required'      => trans('admin_validation.Email is required'),
+            'email.unique'        => trans('admin_validation.Email already exist'),
+            'password.required'   => trans('admin_validation.Password is required'),
+            'password.min'        => trans('admin_validation.Password Must be 4 characters'),
+            'shop_name.required'  => trans('admin_validation.Name is required'),
+            'shop_name.unique'    => trans('admin_validation.Email already exist'),
+            'phone.required'      => trans('admin_validation.Name is required'),
+        ];
+        $this->validate($request, $rules, $customMessages);
+
+        $user = new User();
+        $user->name           = $request->name;
+        $user->email          = $request->email;
+        $user->password       = Hash::make($request->password);
+        $user->status         = 1;
+        $user->email_verified = 1;
+        $user->save();
+
+        $seller = new Vendor();
+        $seller->user_id      = $user->id;
+        $seller->shop_name    = $request->shop_name;
+        $seller->slug         = \Str::slug($request->shop_name) . '-' . $user->id;
+        $seller->email        = $request->email;
+        $seller->phone        = $request->phone;
+        $seller->address      = $request->address ?? '';
+        $seller->open_at      = $request->open_at ?? '09:00';
+        $seller->closed_at    = $request->closed_at ?? '18:00';
+        $seller->greeting_msg = 'Bienvenido a ' . $request->shop_name;
+        $seller->seo_title    = $request->shop_name;
+        $seller->seo_description = $request->shop_name;
+        $seller->status       = 1;
+
+        // Asignar logo por defecto (become_seller_avatar del Setting)
+        $defaultAvatar = Setting::select('become_seller_avatar')->first();
+        if ($defaultAvatar && $defaultAvatar->become_seller_avatar) {
+            $seller->logo = $defaultAvatar->become_seller_avatar;
+        }
+
+        $seller->save();
+
+        // Enviar correo de aprobación con credenciales de acceso
+        try {
+            MailHelper::setMailConfig();
+            $template = EmailTemplate::where('id', 7)->first();
+            if ($template) {
+                $subject = $template->subject;
+                $message = $template->description;
+                $message = str_replace('{{name}}', $user->name, $message);
+                // Añadir credenciales al final del mensaje
+                $message .= '<br><br><strong>Sus credenciales de acceso:</strong><br>'
+                           . 'Email: ' . $user->email . '<br>'
+                           . 'Contraseña: ' . $request->password;
+                Mail::to($user->email)->send(new ApprovedSellerAccount($message, $subject));
+            }
+        } catch (\Exception $e) {
+            // Si el correo falla no interrumpimos la creación
+        }
+
+        $notification = trans('admin_validation.Create Successfully');
+        $notification = array('messege' => $notification, 'alert-type' => 'success');
+        return redirect()->route('admin.seller-list')->with($notification);
     }
 
     public function pendingSellerList(){
