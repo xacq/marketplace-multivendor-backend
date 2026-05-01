@@ -11,7 +11,7 @@ git pull origin main-fulfillec --ff-only
 # Aplicar configuración de producción
 cp .env.production .env
 
-# Permisos de storage y uploads
+# Permisos de storage y uploads yes
 chown -R www:www storage bootstrap/cache public/uploads
 chmod -R 775 storage bootstrap/cache public/uploads
 
