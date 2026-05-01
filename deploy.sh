@@ -15,11 +15,14 @@ cp .env.production .env
 chown -R www:www storage bootstrap/cache public/uploads
 chmod -R 775 storage bootstrap/cache public/uploads
 
+PHP=/www/server/php/82/bin/php
+COMPOSER=/usr/local/bin/composer
+
 # Instalar dependencias
-php -d disable_functions="" /usr/local/bin/composer install --no-dev --optimize-autoloader
+$PHP -d disable_functions="" $COMPOSER install --no-dev --optimize-autoloader
 
 # Ejecutar migraciones
-php artisan migrate --force
+$PHP artisan migrate --force
 
 # Storage link
 if [ ! -L public/storage ]; then
@@ -27,13 +30,13 @@ if [ ! -L public/storage ]; then
 fi
 
 # Limpiar cachés viejos
-php artisan cache:clear
-php artisan config:clear
-php artisan view:clear
-php artisan route:clear
+$PHP artisan cache:clear
+$PHP artisan config:clear
+$PHP artisan view:clear
+$PHP artisan route:clear
 
 # Reconstruir cachés
-php artisan config:cache
-php artisan view:cache
+$PHP artisan config:cache
+$PHP artisan view:cache
 
 echo "Deployment finished successfully!"
